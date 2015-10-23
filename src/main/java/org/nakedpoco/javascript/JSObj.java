@@ -2,13 +2,13 @@ package org.nakedpoco.javascript;
 
 import static org.nakedpoco.utils.Utils.nullOrEmpty;
 
-public class JSValue {
+public class JSObj {
     public final String name;
     public final Type type;
 
-    public JSValue[] members;
+    public JSObj[] members;
 
-    public JSValue(String name, Type type, JSValue ... members) {
+    public JSObj(String name, Type type, JSObj... members) {
         this.name = name;
         this.type = type;
         this.members = members;
@@ -21,7 +21,7 @@ public class JSValue {
         sb.append(":");
         if(!nullOrEmpty(members)) {
             sb.append("{");
-            for (JSValue member : members) {
+            for (JSObj member : members) {
                 sb.append(member.toString());
             }
             sb.append("}");
