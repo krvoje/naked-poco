@@ -1,131 +1,111 @@
 package org.nakedpoco.javascript;
 
-import org.nakedpoco.javascript.JSObj;
-import org.nakedpoco.javascript.Type;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import static org.nakedpoco.utils.Utils.equalsEither;
+import static org.nakedpoco.utils.Utils.*;
+import static org.nakedpoco.utils.ReflectionUtils.*;
 
 public class InternalRepresentationParser
 {
+    // TODO: Normalize package path
+    // TODO: Arrays
+    // TODO: Cyclic references
+    // TODO: Constructor elements
+    // TODO: Generics
 
-    private static final String GET = "get";
-    private static final String SET = "set";
-    private static final String IS = "is";
+    public final Map<Class, JSClass> mappings = new HashMap<Class, JSClass>();
+    private final Set<Class> encountered = new HashSet<Class>();
 
-    public JSObj convert(Class clazz) {
-        Package pakage = clazz.getPackage();
-        String name = clazz.getName();
+    public JSClass convert(Class clazz) {
+        String name = clazz.getSimpleName();
         return convertField(clazz, name);
     }
 
-    private JSObj convertField(Class clazz, String fieldName) {
-        // TODO: Normalize package path
-        // TODO: Arrays
-        // TODO: Cyclic references
-        // TODO: Constructor elements
-        List<JSObj> members = new ArrayList<JSObj>();
+    public JSClass convertField(Class clazz, String fieldName) {
+        if(mappings.containsKey(clazz))
+            return new JSClass(mappings.get(clazz), fieldName);
+
+        List<JSClass> members = new ArrayList<JSClass>();
+        encountered.add(clazz);
 
         if(clazz.isPrimitive() || clazz.equals(String.class)) {
-            return convertPrimitive(clazz, fieldName);
-        } else {
-            Method[] setters = setters(clazz);
-
-            for(Method getter: getters(clazz)) {
-                members.add(convertField(getter.getReturnType(), fieldName(getter)));
-            }
-
-            for(Field publicField: publicFields(clazz)) {
-                members.add(convertField(publicField.getType(), publicField.getName()));
-            }
-
-            return new JSObj(fieldName, Type.OBJECT, members.toArray(new JSObj[members.size()]));
+            JSClass primitive = convertPrimitive(clazz, fieldName);
+            mappings.put(clazz, primitive);
+            return primitive;
         }
+        else if(clazz.isEnum()) {
+            // TODO: Handle better
+            for(Object enumConstant: clazz.getEnumConstants())
+                members.add(new JSClass(clazz.getSimpleName(), enumConstant.toString(), Type.OBJECT));
 
-    }
-
-    private static JSObj convertPrimitive(Class clazz, String name) {
-        if(clazz.equals(java.lang.Boolean.class)) {
-            return new JSObj(name, Type.BOOLEAN);
+            JSClass _enum = new JSClass(clazz.getSimpleName(), fieldName, Type.OBJECT, members.toArray(new JSClass[members.size()]));
+            mappings.put(clazz, _enum);
+            return _enum;
         }
-        else if(clazz.equals(java.lang.Character.class)
-                || clazz.equals(String.class)) {
-            return new JSObj(name, Type.STRING);
-        }
-        // TODO: later if(clazz.equals(java.lang.Byte.class));
-        else if(equalsEither(clazz,
-                java.lang.Short.class,
-                java.lang.Integer.class,
-                java.lang.Long.class,
-                java.lang.Float.class,
-                java.lang.Double.class)) {
-            return new JSObj(name, Type.NUMBER);
+        else if(clazz.isArray() || clazz.isInstance(Iterable.class)) {
+            JSClass arr = new JSClass(clazz.getSimpleName(), fieldName, Type.ARRAY);
+            mappings.put(clazz, arr);
+            return arr;
         }
         else {
-            return new JSObj(name, Type.NUMBER);
+            for(Method getter: getters(clazz)) {
+                Class getterClazz = getter.getReturnType();
+                if(encountered(getterClazz)) continue;
+                members.add(convertField(getterClazz, fieldName(getter)));
+            }
+
+            for(Field field : publicFields(clazz)) {
+                Class fieldType = field.getType();
+                if(encountered(fieldType)) continue;
+                members.add(convertField(fieldType, field.getName()));
+            }
+
+            JSClass type = new JSClass(clazz.getSimpleName(), fieldName, Type.OBJECT, members.toArray(new JSClass[members.size()]));
+            mappings.put(clazz, type);
+            return type;
+        }
+
+    }
+
+    private JSClass convertPrimitive(Class clazz, String name) {
+        if(equalsEither(clazz,
+                java.lang.Boolean.class,
+                boolean.class)) {
+            return new JSClass(clazz.getSimpleName(), name, Type.BOOLEAN);
+        }
+        else if(equalsEither(clazz,
+                java.lang.Character.class,
+                char.class,
+                String.class)) {
+            return new JSClass(clazz.getSimpleName(), name, Type.STRING);
+        }
+        else if(equalsEither(clazz,
+                java.lang.Byte.class,
+                byte.class)){
+            // TODO: implement
+            return new JSClass(clazz.getSimpleName(), name, Type.UNDEFINED);
+        }
+        else if(equalsEither(clazz,
+                java.lang.Short.class,
+                short.class,
+                java.lang.Integer.class,
+                int.class,
+                java.lang.Long.class,
+                long.class,
+                java.lang.Float.class,
+                float.class,
+                java.lang.Double.class,
+                double.class)) {
+            return new JSClass(clazz.getSimpleName(), name, Type.NUMBER);
+        }
+        else {
+            return new JSClass(clazz.getSimpleName(), name, Type.UNDEFINED);
         }
     }
 
-    private static Field[] publicFields(Class clazz) {
-        Field[] fields = clazz.getFields();
-        List<Field> fs = new ArrayList<Field>();
-        for(Field field: fields) {
-                fs.add(field);
-        }
-        return fs.toArray(new Field[fs.size()]);
-    }
-
-    private static Method[] getters(Class clazz) {
-        List<Method> getters = new ArrayList<Method>();
-        for(Method method: clazz.getDeclaredMethods()) {
-            if(isGetter(method))
-                getters.add(method);
-        }
-        return getters.toArray(new Method[getters.size()]);
-    }
-
-    private static Method[] setters(Class clazz) {
-        List<Method> setters = new ArrayList<Method>();
-        for(Method method: clazz.getDeclaredMethods()) {
-            if(isSetter(method))
-                setters.add(method);
-        }
-        return setters.toArray(new Method[setters.size()]);
-    }
-
-    private static String fieldName(Method getterOrSetter) {
-        String name = getterOrSetter.getName();
-        if(name.startsWith(GET)) {
-            return lowercaseFirst(name.substring(GET.length()));
-        } else if(name.startsWith(IS)) {
-            return lowercaseFirst(name.substring(IS.length()));
-        } else if(name.startsWith(SET)) {
-            return lowercaseFirst(name.substring(SET.length()));
-        } else {
-            return name;
-        }
-    }
-
-    private static boolean isGetter(Method method) {
-        String name = method.getName();
-        return (name.startsWith(GET) || name.startsWith(IS))
-                && !method.getReturnType().equals(Void.class)
-                && !name.equals(GET) && !name.equals(IS);
-    }
-
-    private static boolean isSetter(Method method) {
-        String name = method.getName();
-        return name.startsWith(SET)
-                && method.getReturnType().equals(Void.class)
-                && !name.equals(SET);
-    }
-
-    private static String lowercaseFirst(String string) {
-        // TODO: Checks
-        return string.charAt(0) + string.substring(1);
+    private boolean encountered(Class clazz) {
+        return encountered.contains(clazz) || mappings.containsKey(clazz);
     }
 }
