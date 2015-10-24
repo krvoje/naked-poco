@@ -1,0 +1,41 @@
+Enum(jsObj)::= <<
+var <jsObj.typeName>() = [
+<trunc(jsObj.members): {member|
+    "<member.name>",
+    "<last(jsObj.members).name>"
+];}>
+>>
+
+Observable(member) ::= "self.<member.name>=ko.observable(<member.type.defaultValue>);"
+
+ArrayObservable(member) ::="self.<member.name>=ko.observableArray(<member.type.defaultValue>);"
+
+Function(jsObj) ::= <<
+function <jsObj.typeName>() {
+    self = this;
+
+<jsObj.members: {member|
+<if(member.type.array)>
+    <ArrayObservable(member)>
+<else>
+    <Observable(member)>
+<endif>
+}>
+    self.update = function(dto) {
+<jsObj.members: {member|
+        self.<member.name>(dto.<member.name>);
+    }>    }
+
+    self.dto = function() {
+        return ko.toJS(self);
+    }
+}
+>>
+
+JavaScriptObject(jsObj) ::= <<
+<if(jsObj.type.enum)>
+    <Enum(jsObj)>
+<else>
+    <Function(jsObj)>
+<endif>
+>>

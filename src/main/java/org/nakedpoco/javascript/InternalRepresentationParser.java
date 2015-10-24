@@ -4,88 +4,88 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.nakedpoco.utils.Utils.*;
-import static org.nakedpoco.utils.ReflectionUtils.*;
+import static org.nakedpoco.javascript.Utils.*;
+import static org.nakedpoco.javascript.ReflectionUtils.*;
 
 public class InternalRepresentationParser
 {
     // TODO: Normalize package path
-    // TODO: Arrays
-    // TODO: Cyclic references
     // TODO: Constructor elements
     // TODO: Generics
 
-    public final Map<Class, JSClass> mappings = new HashMap<Class, JSClass>();
-    private final Set<Class> encountered = new HashSet<Class>();
+    public final Map<Class, JSType> prototypes = new HashMap<Class, JSType>();
 
-    public JSClass convert(Class clazz) {
-        String name = clazz.getSimpleName();
-        return convertField(clazz, name);
+    public JSType convert(Class clazz) {
+        String fieldName = clazz.getSimpleName();
+        return convert(clazz, fieldName);
     }
 
-    public JSClass convertField(Class clazz, String fieldName) {
-        if(mappings.containsKey(clazz))
-            return new JSClass(mappings.get(clazz), fieldName);
+    public JSType convert(Class clazz, String fieldName) {
+        scanHierarchy(clazz);
+        return prototypes.get(clazz).withName(fieldName);
+    }
 
-        List<JSClass> members = new ArrayList<JSClass>();
-        encountered.add(clazz);
+    private void scanHierarchy(Class clazz) {
+        if(!prototypes.containsKey(clazz))
+            prototypes.put(clazz, new JSType(clazz));
+        else
+            return;
+        JSType jsType = prototypes.get(clazz);
 
-        if(clazz.isPrimitive() || clazz.equals(String.class)) {
-            JSClass primitive = convertPrimitive(clazz, fieldName);
-            mappings.put(clazz, primitive);
-            return primitive;
+        List<JSType> members = new ArrayList<JSType>();
+
+        if(either(clazz.isPrimitive(), clazz.equals(String.class))) {
+            // Nothing to do here, already done in initialization
+            prototypes.put(clazz, convertPrimitive(clazz));
         }
         else if(clazz.isEnum()) {
             // TODO: Handle better
             for(Object enumConstant: clazz.getEnumConstants())
-                members.add(new JSClass(clazz.getSimpleName(), enumConstant.toString(), Type.OBJECT));
+                members.add(new JSType(clazz, enumConstant.toString(), Type.OBJECT));
 
-            JSClass _enum = new JSClass(clazz.getSimpleName(), fieldName, Type.OBJECT, members.toArray(new JSClass[members.size()]));
-            mappings.put(clazz, _enum);
-            return _enum;
+            prototypes.put(clazz,
+                    jsType
+                        .withType(Type.ENUM)
+                        .withMembers(members.toArray(new JSType[members.size()])));
         }
-        else if(clazz.isArray() || clazz.isInstance(Iterable.class)) {
-            JSClass arr = new JSClass(clazz.getSimpleName(), fieldName, Type.ARRAY);
-            mappings.put(clazz, arr);
-            return arr;
+        else if(clazz.isArray() || isSubclassOf(clazz, Iterable.class)) {
+            // TODO: fix, this renders differently than it should
+            prototypes.put(clazz, jsType.withType(Type.ARRAY));
         }
         else {
             for(Method getter: getters(clazz)) {
                 Class getterClazz = getter.getReturnType();
-                if(encountered(getterClazz)) continue;
-                members.add(convertField(getterClazz, fieldName(getter)));
+                members.add(convert(getterClazz, fieldName(getter)));
             }
 
             for(Field field : publicFields(clazz)) {
                 Class fieldType = field.getType();
-                if(encountered(fieldType)) continue;
-                members.add(convertField(fieldType, field.getName()));
+                members.add(convert(fieldType, field.getName()));
             }
 
-            JSClass type = new JSClass(clazz.getSimpleName(), fieldName, Type.OBJECT, members.toArray(new JSClass[members.size()]));
-            mappings.put(clazz, type);
-            return type;
+            prototypes.put(clazz, jsType
+                    .withType(Type.OBJECT)
+                    .withMembers(members));
         }
-
     }
 
-    private JSClass convertPrimitive(Class clazz, String name) {
+    private static JSType convertPrimitive(Class clazz) {
         if(equalsEither(clazz,
                 java.lang.Boolean.class,
                 boolean.class)) {
-            return new JSClass(clazz.getSimpleName(), name, Type.BOOLEAN);
+            return new JSType(clazz, clazz.getSimpleName(), Type.BOOLEAN);
         }
         else if(equalsEither(clazz,
                 java.lang.Character.class,
                 char.class,
                 String.class)) {
-            return new JSClass(clazz.getSimpleName(), name, Type.STRING);
+            return new JSType(clazz, clazz.getSimpleName(), Type.STRING);
         }
         else if(equalsEither(clazz,
                 java.lang.Byte.class,
                 byte.class)){
             // TODO: implement
-            return new JSClass(clazz.getSimpleName(), name, Type.UNDEFINED);
+            return new JSType(clazz, clazz.getSimpleName(), Type.UNDEFINED);
         }
         else if(equalsEither(clazz,
                 java.lang.Short.class,
@@ -98,14 +98,10 @@ public class InternalRepresentationParser
                 float.class,
                 java.lang.Double.class,
                 double.class)) {
-            return new JSClass(clazz.getSimpleName(), name, Type.NUMBER);
+            return new JSType(clazz, clazz.getSimpleName(), Type.NUMBER);
         }
         else {
-            return new JSClass(clazz.getSimpleName(), name, Type.UNDEFINED);
+            return new JSType(clazz, clazz.getSimpleName(), Type.UNDEFINED);
         }
-    }
-
-    private boolean encountered(Class clazz) {
-        return encountered.contains(clazz) || mappings.containsKey(clazz);
     }
 }

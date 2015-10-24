@@ -11,7 +11,8 @@ public enum Type {
     ARRAY("[]"),
 
     // Non-JavaScript, added for convenience
-    FUNCTION("function(){}")
+    FUNCTION("function(){}"),
+    ENUM("function(){}")
     ;
 
     public final String defaultValue;
@@ -23,5 +24,13 @@ public enum Type {
 
     public void containingType(Class clazz) {
         this.containingType = containingType;
+    }
+
+    public boolean isArray() {
+        return this.equals(ARRAY);
+    }
+
+    public boolean isEnum() {
+        return this.equals(ENUM);
     }
 }
