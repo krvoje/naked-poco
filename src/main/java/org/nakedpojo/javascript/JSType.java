@@ -1,4 +1,4 @@
-package org.nakedpoco.javascript;
+package org.nakedpojo.javascript;
 
 import java.util.*;
 
@@ -24,10 +24,6 @@ public class JSType {
         this.name = name;
         this.type = type;
         this.members = members;
-    }
-
-    public JSType withJavaType(Class javaType) {
-        return new JSType(javaType, name, type, members);
     }
 
     public JSType withName(String fieldName) {

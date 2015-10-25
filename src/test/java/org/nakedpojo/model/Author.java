@@ -1,4 +1,4 @@
-package org.nakedpoco.model;
+package org.nakedpojo.model;
 
 import java.util.List;
 

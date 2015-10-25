@@ -1,9 +1,13 @@
-Enum(jsObj)::= <<
-var <jsObj.typeName>() = [
-<trunc(jsObj.members): {member|
+csv(members) ::= <<
+<trunc(members): {member|
     "<member.name>",
-    "<last(jsObj.members).name>"
-];}>
+    "<last(jsObj.members).name>"}>
+>>
+
+Enum(jsObj)::= <<
+var <jsObj.typeName> = [
+<csv(jsObj.members)>
+];
 >>
 
 Observable(member) ::= "self.<member.name>=ko.observable(<member.type.defaultValue>);"

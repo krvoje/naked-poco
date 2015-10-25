@@ -5,13 +5,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.krvoje</groupId>
-    <artifactId>naked-poco</artifactId>
+    <artifactId>naked-pojo</artifactId>
     <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>stringtemplate</artifactId>
             <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.15</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -1,11 +1,10 @@
-package org.nakedpoco.javascript;
+package org.nakedpojo.javascript;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.nakedpoco.javascript.Utils.*;
-import static org.nakedpoco.javascript.ReflectionUtils.*;
+import static org.nakedpojo.javascript.Utils.*;
 
 public class InternalRepresentationParser
 {

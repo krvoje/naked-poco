@@ -1,4 +1,4 @@
-package org.nakedpoco.model;
+package org.nakedpojo.model;
 
 public class Book {
     public enum Genre {
