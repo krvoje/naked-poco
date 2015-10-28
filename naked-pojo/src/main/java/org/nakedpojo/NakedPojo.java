@@ -14,16 +14,20 @@ public class NakedPojo {
 
     private final Set<Class<?>> targets = new HashSet<Class<?>>();
 
+    private final InternalRepresentationParser parser = new InternalRepresentationParser();
     private final STGroupFile stGroupFile = new STGroupFile(DEFAULT_TEMPLATE_FILE);
 
     private static String DEFAULT_TEMPLATE_FILE = "NakedPojoTemplates.stg";
-
 
     /**
      * For tests
      */
     NakedPojo(Reflections reflections) {
         targets.addAll(reflections.getSubTypesOf(Object.class));
+    }
+
+    public NakedPojo() {
+
     }
 
     public NakedPojo(Package ... packages) {
@@ -41,13 +45,17 @@ public class NakedPojo {
             targets.add(clazz);
     }
 
+    public String render(Class clazz) {
+        if(!targets.contains(clazz)) targets.add(clazz);
+        ST template = stGroupFile.getInstanceOf("JavaScriptObject");
+        template.add("jsObj", parser.convert(clazz));
+        return template.render();
+    }
+
     public String renderAll() {
-        InternalRepresentationParser parser = new InternalRepresentationParser();
         StringBuilder sb = new StringBuilder();
         for(Class clazz: targets) {
-            ST template = stGroupFile.getInstanceOf("JavaScriptObject");
-            template.add("jsObj", parser.convert(clazz));
-            sb.append(template.render());
+            sb.append(this.render(clazz));
         }
         return sb.toString();
     }

@@ -11,6 +11,7 @@ import org.reflections.util.ClasspathHelper;
 
 @RunWith(JUnit4.class)
 public class InternalRepresentationParserTest {
+
     @Test
     public void testPerPackage() {
         Reflections reflections = new Reflections(
@@ -25,5 +26,10 @@ public class InternalRepresentationParserTest {
     public void testPerClass() {
         NakedPojo np = new NakedPojo(Book.class, Author.class);
         System.out.println(np.renderAll());
+    }
+
+    @Test
+    public void testNone() {
+
     }
 }
