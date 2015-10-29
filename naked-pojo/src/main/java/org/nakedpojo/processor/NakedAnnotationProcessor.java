@@ -19,10 +19,9 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        System.out.println("Processing...");
         for(TypeElement annotation: annotations) {
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
-            if(annotation.getClass().equals(Naked.class)) {
+            if(annotation.getQualifiedName().equals(Naked.class.getCanonicalName())) {
                 processNaked(elements);
             }
         }
