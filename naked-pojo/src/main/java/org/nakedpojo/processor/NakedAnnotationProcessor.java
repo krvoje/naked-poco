@@ -2,7 +2,6 @@ package org.nakedpojo.processor;
 
 import org.nakedpojo.NakedPojo;
 import org.nakedpojo.annotations.Naked;
-import org.nakedpojo.javascript.InternalRepresentationParser;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;

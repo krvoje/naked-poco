@@ -1,6 +1,6 @@
 package org.nakedpojo;
 
-import org.nakedpojo.javascript.InternalRepresentationParser;
+import org.nakedpojo.javascript.ReflectionsParser;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -14,7 +14,7 @@ public class NakedPojo {
 
     private final Set<Class<?>> targets = new HashSet<Class<?>>();
 
-    private final InternalRepresentationParser parser = new InternalRepresentationParser();
+    private final ReflectionsParser parser = new ReflectionsParser();
     private final STGroupFile stGroupFile = new STGroupFile(DEFAULT_TEMPLATE_FILE);
 
     private static String DEFAULT_TEMPLATE_FILE = "NakedPojoTemplates.stg";

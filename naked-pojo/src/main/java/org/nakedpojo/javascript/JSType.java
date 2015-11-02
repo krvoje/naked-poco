@@ -11,7 +11,7 @@ public class JSType {
     public final JSType[] members;
 
     public JSType(Class javaType) {
-        this(javaType, javaType.getSimpleName(), Type.UNDEFINED);
+        this(javaType, javaType.getSimpleName().toString(), Type.UNDEFINED);
     }
 
     public JSType(Class javaType, String name) {
@@ -20,7 +20,7 @@ public class JSType {
 
     public JSType(Class javaType, String name, Type type, JSType... members) {
         this.javaType = javaType;
-        this.typeName = javaType.getSimpleName();
+        this.typeName = javaType.getSimpleName().toString();
         this.name = name;
         this.type = type;
         this.members = members;

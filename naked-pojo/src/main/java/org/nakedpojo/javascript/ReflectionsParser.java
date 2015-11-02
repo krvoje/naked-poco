@@ -6,7 +6,7 @@ import java.util.*;
 
 import static org.nakedpojo.javascript.Utils.*;
 
-public class InternalRepresentationParser
+public class ReflectionsParser
 {
     // TODO: Normalize package path
     // TODO: Constructor elements

@@ -10,7 +10,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 
 @RunWith(JUnit4.class)
-public class InternalRepresentationParserTest {
+public class ReflectionsParserTest {
 
     @Test
     public void testPerPackage() {
