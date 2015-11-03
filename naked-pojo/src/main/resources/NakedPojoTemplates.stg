@@ -1,7 +1,7 @@
 csv(members) ::= <<
 <trunc(members): {member|
-    "<member.name>",
-    "<last(jsObj.members).name>"}>
+    "<member.fieldName>",
+    "<last(jsObj.members).fieldName>"}>
 >>
 
 Enum(jsObj)::= <<
@@ -10,9 +10,9 @@ var <jsObj.typeName> = [
 ];
 >>
 
-Observable(member) ::= "self.<member.name>=ko.observable(<member.type.defaultValue>);"
+Observable(member) ::= "self.<member.fieldName>=ko.observable(<member.type.defaultValue>);"
 
-ArrayObservable(member) ::="self.<member.name>=ko.observableArray(<member.type.defaultValue>);"
+ArrayObservable(member) ::="self.<member.fieldName>=ko.observableArray(<member.type.defaultValue>);"
 
 Function(jsObj) ::= <<
 function <jsObj.typeName>() {
@@ -27,7 +27,7 @@ function <jsObj.typeName>() {
 }>
     self.update = function(dto) {
 <jsObj.members: {member|
-        self.<member.name>(dto.<member.name>);
+        self.<member.fieldName>(dto.<member.fieldName>);
     }>    }
 
     self.dto = function() {

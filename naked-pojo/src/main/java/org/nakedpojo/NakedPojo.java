@@ -1,51 +1,31 @@
 package org.nakedpojo;
 
-import org.nakedpojo.javascript.ReflectionsParser;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class NakedPojo {
+public class NakedPojo<T> {
 
-    private final Set<Class<?>> targets = new HashSet<Class<?>>();
+    private final Set<T> targets = new HashSet<T>();
 
-    private final ReflectionsParser parser = new ReflectionsParser();
+    private final Parser<T> parser;
     private final STGroupFile stGroupFile = new STGroupFile(DEFAULT_TEMPLATE_FILE);
 
     private static String DEFAULT_TEMPLATE_FILE = "NakedPojoTemplates.stg";
 
-    /**
-     * For tests
-     */
-    NakedPojo(Reflections reflections) {
-        targets.addAll(reflections.getSubTypesOf(Object.class));
+    public NakedPojo(Parser<T> parser) {
+        this.parser = parser;
     }
 
-    public NakedPojo() {
-
+    public NakedPojo(Parser<T> parser, T ... targets) {
+        this(parser);
+        for(T target : targets)
+            this.targets.add(target);
     }
 
-    public NakedPojo(Package ... packages) {
-        for(String name: packageNames(packages)) {
-            Reflections reflections = new Reflections(
-                    ClasspathHelper.forPackage(name),
-                    new SubTypesScanner(false),
-                    ClasspathHelper.forClass(this.getClass()));
-            targets.addAll(reflections.getSubTypesOf(Object.class));
-        }
-    }
-
-    public NakedPojo(Class ... classes) {
-        for(Class clazz : classes)
-            targets.add(clazz);
-    }
-
-    public String render(Class clazz) {
+    public String render(T clazz) {
         if(!targets.contains(clazz)) targets.add(clazz);
         ST template = stGroupFile.getInstanceOf("JavaScriptObject");
         template.add("jsObj", parser.convert(clazz));
@@ -54,7 +34,7 @@ public class NakedPojo {
 
     public String renderAll() {
         StringBuilder sb = new StringBuilder();
-        for(Class clazz: targets) {
+        for(T clazz: targets) {
             sb.append(this.render(clazz));
         }
         return sb.toString();

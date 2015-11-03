@@ -1,12 +1,15 @@
 package org.nakedpojo.javascript;
 
+import static org.nakedpojo.javascript.ReflectionUtils.*;
+import org.nakedpojo.Parser;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.nakedpojo.javascript.Utils.*;
 
-public class ReflectionsParser
+public class ReflectionsParser implements Parser<Class>
 {
     // TODO: Normalize package path
     // TODO: Constructor elements
@@ -26,7 +29,7 @@ public class ReflectionsParser
 
     private void scanHierarchy(Class clazz) {
         if(!prototypes.containsKey(clazz))
-            prototypes.put(clazz, new JSType(clazz));
+            prototypes.put(clazz, new JSType(clazz.getSimpleName()));
         else
             return;
         JSType jsType = prototypes.get(clazz);
@@ -40,7 +43,7 @@ public class ReflectionsParser
         else if(clazz.isEnum()) {
             // TODO: Handle better
             for(Object enumConstant: clazz.getEnumConstants())
-                members.add(new JSType(clazz, enumConstant.toString(), Type.OBJECT));
+                members.add(new JSType(clazz.getSimpleName(), enumConstant.toString(), Type.OBJECT));
 
             prototypes.put(clazz,
                     jsType
@@ -72,19 +75,19 @@ public class ReflectionsParser
         if(equalsEither(clazz,
                 java.lang.Boolean.class,
                 boolean.class)) {
-            return new JSType(clazz, clazz.getSimpleName(), Type.BOOLEAN);
+            return new JSType(clazz.getSimpleName(), Type.BOOLEAN);
         }
         else if(equalsEither(clazz,
                 java.lang.Character.class,
                 char.class,
                 String.class)) {
-            return new JSType(clazz, clazz.getSimpleName(), Type.STRING);
+            return new JSType(clazz.getSimpleName(), Type.STRING);
         }
         else if(equalsEither(clazz,
                 java.lang.Byte.class,
                 byte.class)){
             // TODO: implement
-            return new JSType(clazz, clazz.getSimpleName(), Type.UNDEFINED);
+            return new JSType(clazz.getSimpleName(), Type.UNDEFINED);
         }
         else if(equalsEither(clazz,
                 java.lang.Short.class,
@@ -97,10 +100,10 @@ public class ReflectionsParser
                 float.class,
                 java.lang.Double.class,
                 double.class)) {
-            return new JSType(clazz, clazz.getSimpleName(), Type.NUMBER);
+            return new JSType(clazz.getSimpleName(), Type.NUMBER);
         }
         else {
-            return new JSType(clazz, clazz.getSimpleName(), Type.UNDEFINED);
+            return new JSType(clazz.getSimpleName(), Type.UNDEFINED);
         }
     }
 }
