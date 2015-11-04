@@ -1,9 +1,8 @@
 package org.nakedpojo.processor;
 
 import org.nakedpojo.NakedPojo;
-import org.nakedpojo.Parser;
 import org.nakedpojo.annotations.Naked;
-import org.nakedpojo.javascript.ElementParser;
+import org.nakedpojo.javascript.TypeMirrorParser;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -16,7 +15,7 @@ import java.util.Set;
 @SupportedAnnotationTypes(Naked.NAME)
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
-    private final NakedPojo nakedPojo = new NakedPojo(new ElementParser());
+    private final NakedPojo nakedPojo = new NakedPojo(new TypeMirrorParser());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {

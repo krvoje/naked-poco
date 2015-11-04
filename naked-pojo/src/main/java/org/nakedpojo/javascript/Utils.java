@@ -51,4 +51,26 @@ class Utils {
         }
         return false;
     }
+
+    static String fieldNameFromGetterOrSetter(String methodName) {
+        if(methodName.startsWith(GET)) {
+            return lowercaseFirst(methodName.substring(GET.length()));
+        } else if(methodName.startsWith(IS)) {
+            return lowercaseFirst(methodName.substring(IS.length()));
+        } else if(methodName.startsWith(SET)) {
+            return lowercaseFirst(methodName.substring(SET.length()));
+        } else {
+            return methodName;
+        }
+    }
+
+    static boolean isGetterName(String name) {
+        return (name.startsWith(GET) || name.startsWith(IS))
+                && !name.equals(GET) && !name.equals(IS);
+    }
+
+    static boolean isSetterName(String name) {
+        return name.startsWith(SET)
+                && !name.equals(SET);
+    }
 }

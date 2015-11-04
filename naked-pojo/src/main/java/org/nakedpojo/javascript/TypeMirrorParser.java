@@ -4,6 +4,8 @@ import org.nakedpojo.Parser;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -15,37 +17,22 @@ import java.util.Map;
 
 import static org.nakedpojo.javascript.Utils.*;
 
-public class ElementParser implements Parser<Element>
+public class TypeMirrorParser implements Parser<Element>
 {
     // TODO: Normalize package path
     // TODO: Constructor elements
     // TODO: Generics
 
-    public final Map<Element, JSType> prototypes = new HashMap<Element, JSType>();
+    public final Map<TypeMirror, JSType> prototypes = new HashMap<TypeMirror, JSType>();
 
     private final ProcessingEnvironment processingEnvironment;
     private final Types types;
     private final Elements elements;
 
-    public ElementParser(ProcessingEnvironment processingEnvironment) {
+    public TypeMirrorParser(ProcessingEnvironment processingEnvironment) {
         this.processingEnvironment = processingEnvironment;
         this.types = processingEnvironment.getTypeUtils();
         this.elements = processingEnvironment.getElementUtils();
-    }
-
-    private boolean isPrimitive(Element element) {
-        TypeMirror stringType = elements.getTypeElement("java.lang.String").asType();
-        return element.asType().getKind().isPrimitive()
-            || types.isSameType(element.asType(), stringType);
-    }
-
-    private boolean isEnum(Element element) {
-        return types.isSubtype(element.asType(), elements.getTypeElement("java.lang.Enum").asType());
-    }
-
-    private boolean isArray(Element element) {
-        return element.asType().getKind().equals(TypeKind.ARRAY)
-            || types.isSubtype(element.asType(), elements.getTypeElement("java.lang.Iterable").asType());
     }
 
     public JSType convert(Element clazz) {
@@ -54,13 +41,12 @@ public class ElementParser implements Parser<Element>
     }
 
     public JSType convert(Element clazz, String fieldName) {
-        scanHierarchy(clazz);
-        return prototypes.get(clazz).withName(fieldName);
+        return convert(clazz, fieldName);
     }
 
     private void scanHierarchy(Element clazz) {
         if(!prototypes.containsKey(clazz))
-            prototypes.put(clazz, new JSType(clazz.getSimpleName().toString()));
+            prototypes.put(clazz.asType(), new JSType(clazz.getSimpleName().toString()));
         else
             return;
 
@@ -70,7 +56,7 @@ public class ElementParser implements Parser<Element>
 
         if(isPrimitive(clazz)) {
             // Nothing to do here, already done in initialization
-            prototypes.put(clazz, convertPrimitive(clazz));
+            prototypes.put(clazz.asType(), convertPrimitive(clazz));
         }
         else if(isEnum(clazz)) {
             // TODO: Handle better
@@ -79,18 +65,18 @@ public class ElementParser implements Parser<Element>
 
             members.add(new JSType("Fake enum", Type.STRING));
 
-            prototypes.put(clazz,
+            prototypes.put(clazz.asType(),
                     jsType
                         .withType(Type.ENUM)
                         .withMembers(members.toArray(new JSType[members.size()])));
         }
         else if(isArray(clazz)) {
             // TODO: fix, this renders differently than it should
-            prototypes.put(clazz, jsType.withType(Type.ARRAY));
+            prototypes.put(clazz.asType(), jsType.withType(Type.ARRAY));
         }
         else {
             for(Element getter: getters(clazz)) {
-                Element getterClazz = getter.getReturnType();
+                Element getterClazz = ((ExecutableElement)getter).getReturnType();
                 members.add(convert(getter, getter.getSimpleName().toString()));
             }
 
@@ -99,7 +85,7 @@ public class ElementParser implements Parser<Element>
                 members.add(convert(fieldType, field.getName()));
             }
 
-            prototypes.put(clazz, jsType
+            prototypes.put(clazz.asType(), jsType
                     .withType(Type.OBJECT)
                     .withMembers(members));
         }
@@ -139,5 +125,71 @@ public class ElementParser implements Parser<Element>
         else {
             return new JSType(clazz.getSimpleName().toString(), Type.UNDEFINED);
         }
+    }
+
+    private List<Element> getters(Element element) {
+        // TODO: missing functionality
+        List<Element> getters = new ArrayList<Element>();
+        for(Element enclosed: element.getEnclosedElements()) {
+            if(element instanceof ExecutableElement) {
+                ExecutableElement executableElement = (ExecutableElement) element;
+                TypeKind typeKind = element.asType().getKind();
+                String name = element.getSimpleName().toString();
+                element.getModifiers();
+                if(isGetterName(name)
+                        && typeKind.equals(TypeKind.EXECUTABLE)
+                        && element.getModifiers().contains(Modifier.PUBLIC)
+                        && !executableElement.getReturnType().getKind().equals(TypeKind.VOID)) {
+                    getters.add(enclosed);
+                }
+            }
+        }
+        return getters;
+    }
+
+    private List<Element> setters(Element element) {
+        // TODO: missing functionality
+        List<Element> setters = new ArrayList<Element>();
+        for(Element enclosed: element.getEnclosedElements()) {
+            if(element instanceof ExecutableElement) {
+                ExecutableElement executableElement = (ExecutableElement) element;
+                TypeKind typeKind = element.asType().getKind();
+                String name = element.getSimpleName().toString();
+                element.getModifiers();
+                if(isSetterName(name)
+                        && typeKind.equals(TypeKind.EXECUTABLE)
+                        && element.getModifiers().contains(Modifier.PUBLIC)
+                        && executableElement.getReturnType().getKind().equals(TypeKind.VOID)) {
+                    setters.add(enclosed);
+                }
+            }
+        }
+        return setters;
+    }
+
+    private List<Element> publicFields(Element element) {
+        List<Element> publicFields = new ArrayList<Element>();
+        for(Element enclosed: element.getEnclosedElements()) {
+            if(enclosed.getKind().isField()) {
+                if(enclosed.getModifiers().contains(Modifier.PUBLIC))
+                    publicFields.add(enclosed);
+            }
+        }
+        return publicFields;
+    }
+
+    private boolean isPrimitive(Element element) {
+        TypeMirror stringType = elements.getTypeElement("java.lang.String").asType();
+        return element.asType().getKind().isPrimitive()
+                || types.isSameType(element.asType(), stringType);
+    }
+
+    private boolean isEnum(Element element) {
+        return types.isSubtype(element.asType(), elements.getTypeElement("java.lang.Enum").asType());
+    }
+
+    private boolean isArray(Element element) {
+        return element.asType().getKind().equals(TypeKind.ARRAY)
+                || types.isSubtype(element.asType(), elements.getTypeElement("java.lang.Iterable").asType());
     }
 }

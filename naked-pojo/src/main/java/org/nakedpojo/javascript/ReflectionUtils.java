@@ -41,29 +41,19 @@ class ReflectionUtils {
 
     static String fieldName(Method getterOrSetter) {
         String name = getterOrSetter.getName();
-        if(name.startsWith(GET)) {
-            return lowercaseFirst(name.substring(GET.length()));
-        } else if(name.startsWith(IS)) {
-            return lowercaseFirst(name.substring(IS.length()));
-        } else if(name.startsWith(SET)) {
-            return lowercaseFirst(name.substring(SET.length()));
-        } else {
-            return name;
-        }
+        return fieldNameFromGetterOrSetter(name);
     }
 
     static boolean isGetter(Method method) {
         String name = method.getName();
-        return (name.startsWith(GET) || name.startsWith(IS))
-                && !method.getReturnType().equals(Void.class)
-                && !name.equals(GET) && !name.equals(IS);
+        return isGetterName(name)
+                && !method.getReturnType().equals(Void.class);
     }
 
     static boolean isSetter(Method method) {
         String name = method.getName();
-        return name.startsWith(SET)
-                && method.getReturnType().equals(Void.class)
-                && !name.equals(SET);
+        return isSetterName(name)
+                && method.getReturnType().equals(Void.class);
     }
 
     static boolean isSubclassOf(Class clazz, Class superClazz) {
