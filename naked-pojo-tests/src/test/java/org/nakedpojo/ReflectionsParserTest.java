@@ -36,6 +36,6 @@ public class ReflectionsParserTest {
 
     @Test
     public void testNone() {
-
+        System.out.println();
     }
 }

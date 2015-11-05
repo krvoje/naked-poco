@@ -1,5 +1,8 @@
 package org.nakedpojo.model;
 
+import org.nakedpojo.annotations.Naked;
+
+@Naked
 public class Book {
     public enum Genre {
         SF,

@@ -4,32 +4,37 @@ import org.nakedpojo.NakedPojo;
 import org.nakedpojo.annotations.Naked;
 import org.nakedpojo.javascript.TypeMirrorParser;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 import java.util.Set;
 
-@SupportedAnnotationTypes(Naked.NAME)
+//@SupportedAnnotationTypes(Naked.NAME)
+@SupportedAnnotationTypes("*")
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
-    private final NakedPojo nakedPojo = new NakedPojo(new TypeMirrorParser());
+    private final NakedPojo nakedPojo = new NakedPojo(new TypeMirrorParser(processingEnv));
+    private final Messager messager = processingEnv.getMessager();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for(TypeElement annotation: annotations) {
+            messager.printMessage(Diagnostic.Kind.NOTE, annotation.getQualifiedName());
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
             if(annotation.getQualifiedName().equals(Naked.class.getCanonicalName())) {
                 processNaked(elements);
             }
         }
+        messager.printMessage(Diagnostic.Kind.NOTE, nakedPojo.renderAll());
+        if(true)throw new RuntimeException("");
         return true;
     }
 
     private void processNaked(Set<? extends Element> elements) {
         for(Element e: elements) {
+            messager.printMessage(Diagnostic.Kind.NOTE, "Processing " + e.getSimpleName().toString());
             processNaked(e);
         }
     }
@@ -40,7 +45,7 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
               element.getSimpleName().toString() :
                 naked.targetTypeName();
         String content = nakedPojo.render(element);
-        System.out.println(content);
+        messager.printMessage(Diagnostic.Kind.NOTE, content);
     }
 
     public SourceVersion getSupportedSourceVersion() {

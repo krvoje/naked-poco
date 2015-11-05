@@ -4,7 +4,7 @@ import java.util.*;
 
 public class JSType {
     public final String typeName;
-    public final String name;
+    public final String fieldName;
     public final Type type;
 
     public final JSType[] members;
@@ -27,7 +27,7 @@ public class JSType {
 
     public JSType(String typeName, String fieldName, Type type, JSType... members) {
         this.typeName = typeName;
-        this.name = fieldName;
+        this.fieldName = fieldName;
         this.type = type;
         this.members = members;
     }
@@ -37,14 +37,14 @@ public class JSType {
     }
 
     public JSType withType(Type type) {
-        return new JSType(name, type, members);
+        return new JSType(fieldName, type, members);
     }
 
     public JSType withMembers(JSType[] members) {
-        return new JSType(name, type, members);
+        return new JSType(fieldName, type, members);
     }
 
     public JSType withMembers(Collection<JSType> members) {
-        return new JSType(name, type, members.toArray(new JSType[members.size()]));
+        return new JSType(fieldName, type, members.toArray(new JSType[members.size()]));
     }
 }

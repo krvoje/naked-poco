@@ -31,6 +31,10 @@ public class TypeMirrorParser implements Parser<Element>
 
     public TypeMirrorParser(ProcessingEnvironment processingEnvironment) {
         this.processingEnvironment = processingEnvironment;
+        if(processingEnvironment == null)
+            System.out.println("processingEnvironment is null");
+        else
+            System.out.println("processingEnvironment is not null");
         this.types = processingEnvironment.getTypeUtils();
         this.elements = processingEnvironment.getElementUtils();
     }
@@ -75,14 +79,14 @@ public class TypeMirrorParser implements Parser<Element>
             prototypes.put(clazz.asType(), jsType.withType(Type.ARRAY));
         }
         else {
-            for(Element getter: getters(clazz)) {
-                Element getterClazz = ((ExecutableElement)getter).getReturnType();
-                members.add(convert(getter, getter.getSimpleName().toString()));
+            for(ExecutableElement getter: getters(clazz)) {
+                Element returnTypeClass = types.asElement(getter.getReturnType());
+                members.add(convert(returnTypeClass, returnTypeClass.getSimpleName().toString()));
             }
 
             for(Element field : publicFields(clazz)) {
-                Class fieldType = field.getType();
-                members.add(convert(fieldType, field.getName()));
+                Element fieldType = types.asElement(field.asType());
+                members.add(convert(fieldType, field.getSimpleName().toString()));
             }
 
             prototypes.put(clazz.asType(), jsType
@@ -127,9 +131,9 @@ public class TypeMirrorParser implements Parser<Element>
         }
     }
 
-    private List<Element> getters(Element element) {
+    private List<ExecutableElement> getters(Element element) {
         // TODO: missing functionality
-        List<Element> getters = new ArrayList<Element>();
+        List<ExecutableElement> getters = new ArrayList<ExecutableElement>();
         for(Element enclosed: element.getEnclosedElements()) {
             if(element instanceof ExecutableElement) {
                 ExecutableElement executableElement = (ExecutableElement) element;
@@ -140,16 +144,16 @@ public class TypeMirrorParser implements Parser<Element>
                         && typeKind.equals(TypeKind.EXECUTABLE)
                         && element.getModifiers().contains(Modifier.PUBLIC)
                         && !executableElement.getReturnType().getKind().equals(TypeKind.VOID)) {
-                    getters.add(enclosed);
+                    getters.add((ExecutableElement)enclosed);
                 }
             }
         }
         return getters;
     }
 
-    private List<Element> setters(Element element) {
+    private List<ExecutableElement> setters(Element element) {
         // TODO: missing functionality
-        List<Element> setters = new ArrayList<Element>();
+        List<ExecutableElement> setters = new ArrayList<ExecutableElement>();
         for(Element enclosed: element.getEnclosedElements()) {
             if(element instanceof ExecutableElement) {
                 ExecutableElement executableElement = (ExecutableElement) element;
@@ -160,7 +164,7 @@ public class TypeMirrorParser implements Parser<Element>
                         && typeKind.equals(TypeKind.EXECUTABLE)
                         && element.getModifiers().contains(Modifier.PUBLIC)
                         && executableElement.getReturnType().getKind().equals(TypeKind.VOID)) {
-                    setters.add(enclosed);
+                    setters.add((ExecutableElement)enclosed);
                 }
             }
         }
