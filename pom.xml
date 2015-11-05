@@ -45,6 +45,11 @@
         </dependencies>
     </dependencyManagement>
 
+    <properties>
+        <naked-pojo.version>1.0.0-SNAPSHOT</naked-pojo.version>
+        <jdk.version>1.7</jdk.version>
+    </properties>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -53,8 +58,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.2</version>
                     <configuration>
-                        <verbose>true</verbose>
-                        <fork>true</fork>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
                     </configuration>
@@ -63,9 +66,5 @@
         </pluginManagement>
     </build>
 
-    <properties>
-        <naked-pojo.version>1.0.0-SNAPSHOT</naked-pojo.version>
-        <jdk.version>1.6</jdk.version>
-    </properties>
 
 </project>

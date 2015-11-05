@@ -25,18 +25,12 @@ public class TypeMirrorParser implements Parser<Element>
 
     public final Map<TypeMirror, JSType> prototypes = new HashMap<TypeMirror, JSType>();
 
-    private final ProcessingEnvironment processingEnvironment;
     private final Types types;
     private final Elements elements;
 
-    public TypeMirrorParser(ProcessingEnvironment processingEnvironment) {
-        this.processingEnvironment = processingEnvironment;
-        if(processingEnvironment == null)
-            System.out.println("processingEnvironment is null");
-        else
-            System.out.println("processingEnvironment is not null");
-        this.types = processingEnvironment.getTypeUtils();
-        this.elements = processingEnvironment.getElementUtils();
+    public TypeMirrorParser(Types types, Elements elements) {
+        this.types = types;
+        this.elements = elements;
     }
 
     public JSType convert(Element clazz) {

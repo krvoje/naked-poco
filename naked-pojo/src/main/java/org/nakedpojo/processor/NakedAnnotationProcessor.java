@@ -2,6 +2,7 @@ package org.nakedpojo.processor;
 
 import org.nakedpojo.NakedPojo;
 import org.nakedpojo.annotations.Naked;
+import org.nakedpojo.javascript.ReflectionsParser;
 import org.nakedpojo.javascript.TypeMirrorParser;
 
 import javax.annotation.processing.*;
@@ -11,12 +12,17 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
-//@SupportedAnnotationTypes(Naked.NAME)
-@SupportedAnnotationTypes("*")
+@SupportedAnnotationTypes(Naked.NAME)
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
-    private final NakedPojo nakedPojo = new NakedPojo(new TypeMirrorParser(processingEnv));
-    private final Messager messager = processingEnv.getMessager();
+    private NakedPojo nakedPojo;
+    private Messager messager;
+
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        this.nakedPojo = new NakedPojo(new TypeMirrorParser(processingEnv.getTypeUtils(), processingEnv.getElementUtils()));
+        this.messager = processingEnv.getMessager();
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -28,7 +34,6 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
             }
         }
         messager.printMessage(Diagnostic.Kind.NOTE, nakedPojo.renderAll());
-        if(true)throw new RuntimeException("");
         return true;
     }
 
@@ -46,9 +51,6 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
                 naked.targetTypeName();
         String content = nakedPojo.render(element);
         messager.printMessage(Diagnostic.Kind.NOTE, content);
-    }
-
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
+        System.out.println(content);
     }
 }

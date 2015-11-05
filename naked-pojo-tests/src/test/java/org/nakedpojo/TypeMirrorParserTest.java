@@ -19,6 +19,5 @@ public class TypeMirrorParserTest {
     @Test
     public void testNone() {
         System.out.println();
-        final NakedPojo nakedPojo = new NakedPojo(new TypeMirrorParser(null));
     }
 }
