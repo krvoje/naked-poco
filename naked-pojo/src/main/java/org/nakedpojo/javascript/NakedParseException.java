@@ -1,6 +1,6 @@
 package org.nakedpojo.javascript;
 
-public class NakedParseException extends Exception {
+public class NakedParseException extends RuntimeException {
 
     public NakedParseException(String message) {
         super(message);

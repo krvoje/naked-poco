@@ -37,7 +37,6 @@ public class ReflectionsParser implements Parser<Class>
         List<JSType> members = new ArrayList<JSType>();
 
         if(either(clazz.isPrimitive(), clazz.equals(String.class))) {
-            // Nothing to do here, already done in initialization
             prototypes.put(clazz, convertPrimitive(clazz));
         }
         else if(clazz.isEnum()) {

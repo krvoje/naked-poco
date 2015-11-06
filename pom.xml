@@ -6,7 +6,7 @@
 
     <groupId>org.krvoje</groupId>
     <artifactId>naked-pojo-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${naked-pojo.version}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -46,9 +46,10 @@
     </dependencyManagement>
 
     <properties>
-        <naked-pojo.version>1.0.0-SNAPSHOT</naked-pojo.version>
+        <naked-pojo.version>0.0.1-SNAPSHOT</naked-pojo.version>
         <jdk.version>1.7</jdk.version>
     </properties>
+
 
     <build>
         <pluginManagement>
@@ -58,6 +59,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.2</version>
                     <configuration>
+                        <verbose>true</verbose>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
                     </configuration>

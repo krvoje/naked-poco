@@ -4,6 +4,7 @@ import org.nakedpojo.annotations.Naked;
 
 @Naked
 public class Book {
+    @Naked
     public enum Genre {
         SF,
         BELETRISTIKA;

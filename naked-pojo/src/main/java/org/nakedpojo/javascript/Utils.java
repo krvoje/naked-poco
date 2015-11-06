@@ -13,6 +13,15 @@ class Utils {
         return string == null || string.isEmpty();
     }
 
+    static <T extends Comparable<T>>boolean comparesToEither(T self, T ... objs) {
+        if(nullOrEmpty(objs)) return true;
+        for(T o: objs) {
+            if(self.compareTo(o) == 0)
+                return true;
+        }
+        return false;
+    }
+
     static boolean equalsEither(Object self, Object ... objs) {
         if(nullOrEmpty(objs)) return true;
         for(Object o: objs) {
