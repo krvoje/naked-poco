@@ -3,11 +3,10 @@ package org.nakedpojo.javascript;
 import java.util.*;
 
 public class JSType {
-    public final String typeName;
-    public final String fieldName;
-    public final Type type;
-
-    public final JSType[] members;
+    private final String typeName;
+    private final String fieldName;
+    private final Type type;
+    private final JSType[] members;
 
     public JSType(String typeName) {
         this(typeName, typeName, Type.UNDEFINED);
@@ -46,5 +45,21 @@ public class JSType {
 
     public JSType withMembers(Collection<JSType> members) {
         return new JSType(fieldName, type, members.toArray(new JSType[members.size()]));
+    }
+
+    public String getTypeName() {
+        return this.typeName;
+    }
+
+    public String getFieldName() {
+        return this.fieldName;
+    }
+
+    public Type getType() {
+        return this.type;
+    }
+
+    public JSType[] getMembers() {
+        return this.members;
     }
 }
