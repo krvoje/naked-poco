@@ -191,14 +191,10 @@ public class TypeMirrorParser implements Parser<Element>
     }
 
     private String typeName(Element clazz) {
-        String typeName;
         if(clazz == null) throw new NakedParseException(Messages.elementIsNull());
-        else if(clazz.asType().getKind().equals(TypeKind.EXECUTABLE)) {
-            typeName = ((ExecutableElement)clazz).getReturnType().toString();
-        }
-        else
-            typeName = clazz.toString();
-        return typeName;
+        return clazz.asType().getKind().equals(TypeKind.EXECUTABLE) ?
+            ((ExecutableElement)clazz).getReturnType().toString()
+                : clazz.toString();
     }
 
     private void note(String string) {

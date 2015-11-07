@@ -1,6 +1,7 @@
 package org.nakedpojo.processor;
 
 import org.nakedpojo.NakedPojo;
+import org.nakedpojo.Configuration;
 import org.nakedpojo.annotations.Naked;
 import org.nakedpojo.javascript.TypeMirrorParser;
 
@@ -9,8 +10,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.Diagnostic;
-import java.io.FileWriter;
+import javax.tools.*;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
@@ -18,19 +18,22 @@ import java.util.Set;
 @SupportedAnnotationTypes(Naked.NAME)
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
-    private static final String TARGET_PATH = ".";
-
     private NakedPojo nakedPojo;
 
     private Types types;
     private Elements elements;
     private Messager messager;
+    private Filer filer;
+
+    private Configuration properties;
 
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.elements = processingEnv.getElementUtils();
         this.types = processingEnv.getTypeUtils();
         this.messager = processingEnv.getMessager();
+        this.filer = processingEnv.getFiler();
+        this.properties = new Configuration();
 
         this.nakedPojo = new NakedPojo(new TypeMirrorParser(types, elements, messager));
     }
@@ -44,30 +47,31 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
                 processNaked(elements);
             }
         }
-        messager.printMessage(Diagnostic.Kind.NOTE, nakedPojo.renderAll());
         return true;
     }
 
     private void processNaked(Set<? extends Element> elements) {
-        for(Element e: elements) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "Processing " + e.getSimpleName().toString());
-            processNaked(e);
+        for(Element element: elements) {
+            String content = nakedPojo.render(element);
+            if(properties.generationStrategy.equals(Configuration.GenerationStrategy.MULTIPLE_FILES)) {
+                Naked naked = element.getAnnotation(Naked.class);
+                String targetTypeName = naked.targetTypeName().isEmpty() ?
+                        element.getSimpleName().toString() :
+                        naked.targetTypeName();
+
+                writeToFile(targetTypeName + ".js", content);
+            }
         }
-    }
 
-    private void processNaked(Element element) {
-        Naked naked = element.getAnnotation(Naked.class);
-        String targetTypeName = naked.targetTypeName().isEmpty() ?
-              element.getSimpleName().toString() :
-                naked.targetTypeName();
-        String content = nakedPojo.render(element);
-
-        writeToFile(targetTypeName+".js", content);
+        if(properties.generationStrategy.equals(Configuration.GenerationStrategy.SINGLE_FILE)) {
+            writeToFile(properties.targetFilename, nakedPojo.renderAll());
+        }
     }
 
     private void writeToFile(String filename, String content) {
         try {
-            Writer writer = new FileWriter(TARGET_PATH + "/" + filename);
+            FileObject fl = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", filename);
+            Writer writer = fl.openWriter();
             writer.write(content);
             writer.close();
         } catch(IOException e) {
