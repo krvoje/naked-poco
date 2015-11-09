@@ -1,18 +1,18 @@
-package org.nakedpojo.javascript;
+package org.nakedpojo.utils;
 
-import static org.nakedpojo.javascript.Utils.*;
+import static org.nakedpojo.utils.Commons.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-class ReflectionUtils {
+public class ReflectionUtils {
 
     private static final String GET = "get";
     private static final String SET = "set";
     private static final String IS = "is";
 
-    static Field[] publicFields(Class clazz) {
+    public static Field[] publicFields(Class clazz) {
         Field[] fields = clazz.getFields();
         List<Field> fs = new ArrayList<Field>();
         for(Field field: fields) {
@@ -21,7 +21,7 @@ class ReflectionUtils {
         return fs.toArray(new Field[fs.size()]);
     }
 
-    static Method[] getters(Class clazz) {
+    public static Method[] getters(Class clazz) {
         List<Method> getters = new ArrayList<Method>();
         for(Method method: clazz.getDeclaredMethods()) {
             if(isGetter(method))
@@ -30,7 +30,7 @@ class ReflectionUtils {
         return getters.toArray(new Method[getters.size()]);
     }
 
-    static Method[] setters(Class clazz) {
+    public static Method[] setters(Class clazz) {
         List<Method> setters = new ArrayList<Method>();
         for(Method method: clazz.getDeclaredMethods()) {
             if(isSetter(method))
@@ -39,24 +39,28 @@ class ReflectionUtils {
         return setters.toArray(new Method[setters.size()]);
     }
 
-    static String fieldName(Method getterOrSetter) {
+    public static String fieldName(Method getterOrSetter) {
         String name = getterOrSetter.getName();
         return fieldNameFromGetterOrSetter(name);
     }
 
-    static boolean isGetter(Method method) {
+    public static boolean isNumeric(Class class) {
+
+    }
+
+    public static boolean isGetter(Method method) {
         String name = method.getName();
         return isGetterName(name)
                 && !method.getReturnType().equals(Void.class);
     }
 
-    static boolean isSetter(Method method) {
+    public static boolean isSetter(Method method) {
         String name = method.getName();
         return isSetterName(name)
                 && method.getReturnType().equals(Void.class);
     }
 
-    static boolean isSubclassOf(Class clazz, Class superClazz) {
+    public static boolean isSubclassOf(Class clazz, Class superClazz) {
         /// XXX: Incomplete, works just for internal implementation
         if(superClazz.isInterface()) {
             if(contains(clazz.getInterfaces(), superClazz)) return true;

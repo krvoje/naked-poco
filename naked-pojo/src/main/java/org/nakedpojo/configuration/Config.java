@@ -1,10 +1,9 @@
-package org.nakedpojo;
+package org.nakedpojo.configuration;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Configuration {
+public class Config {
 
     private static final String PROPS_FILENAME="/nakedpojo.properties";
 
@@ -41,10 +40,10 @@ public class Configuration {
     public final GenerationStrategy generationStrategy;
     public final String targetFilename;
 
-    public Configuration() {
+    public Config() {
         Properties props = new Properties();
         try {
-            InputStream is = Configuration.class.getResourceAsStream(PROPS_FILENAME);
+            InputStream is = Config.class.getResourceAsStream(PROPS_FILENAME);
             props.load(is);
         } catch (Exception e) {
             // TODO: Emit warning

@@ -1,4 +1,4 @@
-package org.nakedpojo.javascript;
+package org.nakedpojo.model.javascript;
 
 public enum Type {
     BOOLEAN("false"),

@@ -3,7 +3,7 @@ package org.nakedpojo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.nakedpojo.javascript.ReflectionsParser;
+import org.nakedpojo.parser.ReflectionsParser;
 import org.nakedpojo.model.Author;
 import org.nakedpojo.model.Book;
 import org.reflections.Reflections;

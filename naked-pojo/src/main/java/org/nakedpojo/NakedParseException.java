@@ -1,4 +1,4 @@
-package org.nakedpojo.javascript;
+package org.nakedpojo;
 
 public class NakedParseException extends RuntimeException {
 

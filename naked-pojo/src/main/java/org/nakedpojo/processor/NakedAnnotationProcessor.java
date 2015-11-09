@@ -1,11 +1,12 @@
 package org.nakedpojo.processor;
 
 import org.nakedpojo.NakedPojo;
-import org.nakedpojo.Configuration;
 import org.nakedpojo.annotations.Naked;
-import org.nakedpojo.javascript.TypeMirrorParser;
+import org.nakedpojo.configuration.Config;
+import org.nakedpojo.parser.TypeMirrorParser;
 
 import javax.annotation.processing.*;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -15,7 +16,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
-@SupportedAnnotationTypes(Naked.NAME)
+//@SupportedAnnotationTypes(Naked.NAME)
+@SupportedAnnotationTypes("*")
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
     private NakedPojo nakedPojo;
@@ -25,7 +27,7 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
     private Messager messager;
     private Filer filer;
 
-    private Configuration properties;
+    private Config properties;
 
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
@@ -33,7 +35,7 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
         this.types = processingEnv.getTypeUtils();
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
-        this.properties = new Configuration();
+        this.properties = new Config();
 
         this.nakedPojo = new NakedPojo(new TypeMirrorParser(types, elements, messager));
     }
@@ -47,24 +49,31 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
                 processNaked(elements);
             }
         }
-        return true;
+
+        // Let's not claim any annotations
+        return false;
     }
 
     private void processNaked(Set<? extends Element> elements) {
         for(Element element: elements) {
-            String content = nakedPojo.render(element);
-            if(properties.generationStrategy.equals(Configuration.GenerationStrategy.MULTIPLE_FILES)) {
+            nakedPojo.scan(element);
+        }
+
+        if(properties.generationStrategy.equals(Config.GenerationStrategy.MULTIPLE_FILES)) {
+            for(Element element: elements) {
                 Naked naked = element.getAnnotation(Naked.class);
                 String targetTypeName = naked.targetTypeName().isEmpty() ?
                         element.getSimpleName().toString() :
                         naked.targetTypeName();
-
+                String content = nakedPojo.render(element);
                 writeToFile(targetTypeName + ".js", content);
             }
         }
 
-        if(properties.generationStrategy.equals(Configuration.GenerationStrategy.SINGLE_FILE)) {
-            writeToFile(properties.targetFilename, nakedPojo.renderAll());
+        if(properties.generationStrategy.equals(Config.GenerationStrategy.SINGLE_FILE)) {
+            String content = nakedPojo.renderAll();
+            System.out.println(content);
+            writeToFile(properties.targetFilename, content);
         }
     }
 
@@ -77,5 +86,10 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
     }
 }

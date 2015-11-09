@@ -1,28 +1,19 @@
-package org.nakedpojo.javascript;
+package org.nakedpojo.utils;
 
-class Utils {
+public class Commons {
 
     private static final String GET = "get";
     private static final String SET = "set";
     private static final String IS = "is";
 
-    static <T> boolean nullOrEmpty(T[] objs) {
+    public static <T> boolean nullOrEmpty(T[] objs) {
         return objs==null || objs.length ==0;
     }
-    static boolean nullOrEmpty(String string) {
+    public static boolean nullOrEmpty(String string) {
         return string == null || string.isEmpty();
     }
 
-    static <T extends Comparable<T>>boolean comparesToEither(T self, T ... objs) {
-        if(nullOrEmpty(objs)) return true;
-        for(T o: objs) {
-            if(self.compareTo(o) == 0)
-                return true;
-        }
-        return false;
-    }
-
-    static boolean equalsEither(Object self, Object ... objs) {
+    public static boolean equalsEither(Object self, Object ... objs) {
         if(nullOrEmpty(objs)) return true;
         for(Object o: objs) {
             if(self.equals(o))
@@ -31,7 +22,7 @@ class Utils {
         return false;
     }
 
-    static boolean equalsAll(Object self, Object ... objs) {
+    public static boolean equalsAll(Object self, Object ... objs) {
         if(nullOrEmpty(objs)) return true;
         for(Object o: objs) {
             if(!self.equals(o))
@@ -40,20 +31,20 @@ class Utils {
         return true;
     }
 
-    static boolean either(Boolean ... exprs) {
+    public static boolean either(Boolean ... exprs) {
         for(Boolean expr: exprs) {
             if(expr) return true;
         }
         return false;
     }
 
-    static String lowercaseFirst(String string) {
+    public static String lowercaseFirst(String string) {
         // TODO: locale
         if(nullOrEmpty(string) || string.length() == 1) return string;
         return string.toLowerCase().charAt(0) + string.substring(1);
     }
 
-    static <T> boolean contains(T[] coll, T a) {
+    public static <T> boolean contains(T[] coll, T a) {
         if(nullOrEmpty(coll)) return false;
         for(T t: coll) {
             if(t.equals(a)) return true;
@@ -61,7 +52,7 @@ class Utils {
         return false;
     }
 
-    static String fieldNameFromGetterOrSetter(String methodName) {
+    public static String fieldNameFromGetterOrSetter(String methodName) {
         if(methodName.startsWith(GET)) {
             return lowercaseFirst(methodName.substring(GET.length()));
         } else if(methodName.startsWith(IS)) {
@@ -73,12 +64,12 @@ class Utils {
         }
     }
 
-    static boolean isGetterName(String name) {
+    public static boolean isGetterName(String name) {
         return (name.startsWith(GET) || name.startsWith(IS))
                 && !name.equals(GET) && !name.equals(IS);
     }
 
-    static boolean isSetterName(String name) {
+    public static boolean isSetterName(String name) {
         return name.startsWith(SET)
                 && !name.equals(SET);
     }

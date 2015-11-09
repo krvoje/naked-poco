@@ -1,15 +1,19 @@
-package org.nakedpojo.javascript;
+package org.nakedpojo.parser;
 
-import static org.nakedpojo.javascript.ReflectionUtils.*;
-import org.nakedpojo.Parser;
+import static java.util.Arrays.asList;
+
+import org.nakedpojo.interfaces.Parser;
+import org.nakedpojo.model.javascript.JSType;
+import org.nakedpojo.model.javascript.Type;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.nakedpojo.javascript.Utils.*;
+import static org.nakedpojo.utils.ReflectionUtils.*;
+import static org.nakedpojo.utils.Commons.*;
 
-public class ReflectionsParser implements Parser<Class>
+public class ReflectionsParser implements Parser<Class, JSType>
 {
     // TODO: Normalize package path
     // TODO: Constructor elements
@@ -23,11 +27,11 @@ public class ReflectionsParser implements Parser<Class>
     }
 
     public JSType convert(Class clazz, String fieldName) {
-        scanHierarchy(clazz);
+        scan(clazz);
         return prototypes.get(clazz).withName(fieldName);
     }
 
-    private void scanHierarchy(Class clazz) {
+    public void scan(Class clazz) {
         if(!prototypes.containsKey(clazz))
             prototypes.put(clazz, new JSType(clazz.getSimpleName()));
         else
@@ -62,6 +66,10 @@ public class ReflectionsParser implements Parser<Class>
             for(Field field : publicFields(clazz)) {
                 Class fieldType = field.getType();
                 members.add(convert(fieldType, field.getName()));
+            }
+
+            for(Class field : nestedClasses(clazz)) {
+                scan(field);
             }
 
             prototypes.put(clazz, jsType
@@ -104,5 +112,13 @@ public class ReflectionsParser implements Parser<Class>
         else {
             return new JSType(clazz.getSimpleName(), Type.UNDEFINED);
         }
+    }
+
+    private List<Class> nestedClasses(Class clazz) {
+        return asList(clazz.getClasses());
+    }
+
+    public Map<Class, JSType> prototypes() {
+        return this.prototypes;
     }
 }
