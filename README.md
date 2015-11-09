@@ -14,7 +14,7 @@ public class Book {
     @Naked
     public enum Genre {
         SF,
-        BELETRISTIKA;
+        BELETRISTICS;
     }
 
     public final String title;
@@ -33,6 +33,12 @@ public class Book {
 This should render a JavaSript object with basic [knockout.js](http://knockoutjs.com/) bindings:
 
 ```JavaScript
+
+    var Genre = [
+        "SF",
+        "BELETRISTICS"
+    ];
+
     function Book() {
         self = this;
 

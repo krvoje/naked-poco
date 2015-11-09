@@ -90,7 +90,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             }
 
             for (Element field : utils.publicFields(element)) {
-                members.add(convert(field, utils.simpleName(field));
+                members.add(convert(field, utils.simpleName(field)));
             }
 
             for (Element nestedClass : utils.nestedClasses(element)) {

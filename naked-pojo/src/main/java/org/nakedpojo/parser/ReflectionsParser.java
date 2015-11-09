@@ -96,17 +96,7 @@ public class ReflectionsParser implements Parser<Class, JSType>
             // TODO: implement
             return new JSType(clazz.getSimpleName(), Type.UNDEFINED);
         }
-        else if(equalsEither(clazz,
-                java.lang.Short.class,
-                short.class,
-                java.lang.Integer.class,
-                int.class,
-                java.lang.Long.class,
-                long.class,
-                java.lang.Float.class,
-                float.class,
-                java.lang.Double.class,
-                double.class)) {
+        else if(isNumeric(clazz)) {
             return new JSType(clazz.getSimpleName(), Type.NUMBER);
         }
         else {

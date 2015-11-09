@@ -44,8 +44,18 @@ public class ReflectionUtils {
         return fieldNameFromGetterOrSetter(name);
     }
 
-    public static boolean isNumeric(Class class) {
-
+    public static boolean isNumeric(Class clazz) {
+        return equalsEither(clazz,
+                java.lang.Short.class,
+                short.class,
+                java.lang.Integer.class,
+                int.class,
+                java.lang.Long.class,
+                long.class,
+                java.lang.Float.class,
+                float.class,
+                java.lang.Double.class,
+                double.class);
     }
 
     public static boolean isGetter(Method method) {
