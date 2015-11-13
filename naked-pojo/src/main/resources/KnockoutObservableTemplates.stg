@@ -1,5 +1,16 @@
 defaultValue(member) ::= <<
-<if(member.type.boolean)>false<elseif(member.type.null)>null<elseif(member.type.undefined)>undefined<elseif(member.type.number)>0<elseif(member.type.string)>""<elseif(member.type.object)>{}<elseif(member.type.array)>[]<elseif(member.type.function)>function(){}<elseif(member.type.enum)>{}<elseif(member.type.enumMember)>{}<else>undefined<endif>
+<if(member.type.boolean)>false<\\>
+<elseif(member.type.null)>null<\\>
+<elseif(member.type.undefined)>undefined<\\>
+<elseif(member.type.number)>0<\\>
+<elseif(member.type.string)>""<\\>
+<elseif(member.type.object)>{}<\\>
+<elseif(member.type.array)>[]<\\>
+<elseif(member.type.function)>function(){}<\\>
+<elseif(member.type.enum)>{}<\\>
+<elseif(member.type.enumMember)>{}<\\>
+<else>undefined<\\>
+<endif>
 >>
 
 csv(members) ::= <<

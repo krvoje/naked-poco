@@ -18,9 +18,10 @@ import java.util.*;
 
 public class TypeMirrorParser implements Parser<Element, JSType>
 {
-    // TODO: Normalize package path
-    // TODO: Constructor elements
+    // TODO: Package path, currently classes with same simple name in different packages will overwrite each other
     // TODO: Generics
+
+    // Note: Whether to take constructors into consideration?
 
     private final Map<Element, JSType> prototypes;
 
@@ -34,37 +35,31 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         this.elements = elements;
         this.messager = messager;
         this.utils = new TypeMirrorUtils(types, elements, messager);
-        this.prototypes = new TreeMap<Element, JSType>(new Comparator<Element>() {
-            @Override
-            public int compare(Element left, Element right) {
-                return utils.typeName(left).compareTo(utils.typeName(right));
-            }
-        });
+        this.prototypes = new TreeMap<>(utils.TYPE_NAME_COMPARATOR);
     }
 
     public JSType convert(Element element) {
-        if(element == null)
-            throw new NakedParseException(Messages.elementIsNull());
+        assertNotNull(element);
         String fieldName = utils.fieldName(element);
         return convert(element, fieldName);
     }
 
     public JSType convert(Element element, String fieldName) {
-        if(element == null)
-            throw new NakedParseException(Messages.elementIsNull());
+        assertNotNull(element);
         scan(element);
         return prototypes.get(element).withName(fieldName);
     }
 
     public void scan(Element element) {
+        assertNotNull(element);
         if(!prototypes.containsKey(element))
             prototypes.put(element, new JSType(utils.fieldName(element)));
         else
             return;
 
-        JSType jsType = prototypes.get(element);
+        JSType prototype = prototypes.get(element);
 
-        List<JSType> members = new ArrayList<JSType>();
+        List<JSType> members = new ArrayList<>();
 
         if(utils.isPrimitive(element)) {
             prototypes.put(element, convertPrimitive(element));
@@ -76,15 +71,14 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             }
 
             prototypes.put(element,
-                    jsType
-                        .withType(Type.ENUM)
-                        .withMembers(members));
+                    prototype
+                            .withType(Type.ENUM)
+                            .withMembers(members));
         }
-        else if(utils.isArray(element)) {
-            // TODO: see whether this needs to be fixed as well, like the Reflections version
-            prototypes.put(element, jsType.withType(Type.ARRAY));
+        else if(utils.isIterable(element)) {
+            prototypes.put(element, prototype.withType(Type.ARRAY));
         }
-        else {
+        else if(utils.isClass(element)) {
             for(ExecutableElement getter: utils.getters(element)) {
                 Element returnTypeClass = types.asElement(getter.getReturnType());
                 members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
@@ -103,10 +97,11 @@ public class TypeMirrorParser implements Parser<Element, JSType>
                 scan(nestedClass);
             }
 
-            prototypes.put(element, jsType
+            prototypes.put(element, prototype
                     .withType(Type.OBJECT)
                     .withMembers(members));
         }
+        // TODO: Any other type of class?
     }
 
     private JSType convertPrimitive(Element element) {
@@ -136,5 +131,9 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     public Map<Element, JSType> prototypes() {
         return this.prototypes;
+    }
+
+    private static void assertNotNull(Element obj) {
+        if(obj == null) throw new NakedParseException(Messages.elementIsNull());
     }
 }

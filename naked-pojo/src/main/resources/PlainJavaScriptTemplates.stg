@@ -32,7 +32,7 @@ function <jsObj.typeName>() {
     self = this;
 
 <jsObj.members: {member|
-<Field(member)>
+    <Field(member)>
 }>
     self.update = function(dto) {
 <jsObj.members: {member|

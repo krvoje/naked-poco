@@ -1,42 +1,35 @@
 package org.nakedpojo;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.nakedpojo.parser.ReflectionsParser;
 import org.nakedpojo.model.Author;
 import org.nakedpojo.model.Book;
-import org.nakedpojo.parser.TypeMirrorParser;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-
-import java.util.Set;
+import org.nakedpojo.parser.ReflectionsParser;
 
 @RunWith(JUnit4.class)
+@Ignore
 public class ReflectionsParserTest {
 
     @Test
-    public void testPerPackage() {
-        Reflections reflections = new Reflections(
-                ClasspathHelper.forPackage("org.nakedpojo.model"),
-                new SubTypesScanner(false),
-                ClasspathHelper.forClass(this.getClass()));
-        Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
+    public void knockoutPerClass() throws Exception {
+        NakedPojo np = new NakedPojo(new ReflectionsParser(),
+                NakedPojo.TemplateType.KNOCKOUT_JS,
+                Book.class, Author.class, Book.Genre.class);
 
-        NakedPojo np = new NakedPojo(new ReflectionsParser(), classes.toArray());
+        String bookJS = np.render(Book.class);
+        String authorJS = np.render(Author.class);
+        String genreJS = np.render(Book.Genre.class);
 
-        System.out.println(np.renderAll());
+        Assert.assertEquals(fileText("Book_knockout_expected.js"), bookJS);
+        Assert.assertEquals(fileText("Author_knockout_expected.js"), authorJS);
+        Assert.assertEquals(fileText("Genre_knockout_expected.js"), genreJS);
     }
 
-    @Test
-    public void testPerClass() {
-        NakedPojo np = new NakedPojo(new ReflectionsParser(), Book.class, Author.class);
-        System.out.println(np.renderAll());
-    }
-
-    @Test
-    public void testNone() {
-        System.out.println();
+    private static String fileText(String filename) throws Exception {
+        return IOUtils.toString(ReflectionsParser.class.getResourceAsStream("/"+filename));
     }
 }

@@ -1,0 +1,4 @@
+    var Genre = [
+        "SF",
+        "BELETRISTIKA"
+    ];

@@ -8,6 +8,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.nakedpojo.utils.Commons.equalsEither;
@@ -21,6 +22,13 @@ public class TypeMirrorUtils {
     private final Messager messager;
 
     private final TypeMirror STRING_TYPE;
+
+    public final Comparator<Element> TYPE_NAME_COMPARATOR = new Comparator<Element>() {
+        @Override
+        public int compare(Element o1, Element o2) {
+            return typeName(o1).compareTo(typeName(o2));
+        }
+    };
 
     public TypeMirrorUtils(Types types, Elements elements, Messager messager) {
         this.types = types;
@@ -67,10 +75,14 @@ public class TypeMirrorUtils {
         return element.getKind().equals(ElementKind.ENUM);
     }
 
-    public boolean isArray(Element element) {
+    public boolean isIterable(Element element) {
         TypeElement list = elements.getTypeElement(java.lang.Iterable.class.getCanonicalName());
         return element.asType().getKind().equals(TypeKind.ARRAY)
                 || types.isSubtype(element.asType(), types.getDeclaredType(list));
+    }
+
+    public boolean isClass(Element element) {
+        return element.getKind().isClass();
     }
 
     public String fieldName(Element element) {

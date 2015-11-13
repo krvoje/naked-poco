@@ -1,27 +1,22 @@
 package org.nakedpojo.model.javascript;
 
 public enum Type {
-    BOOLEAN("false"),
-    NULL("null"),
-    UNDEFINED("undefined"),
-    NUMBER("0"),
-    STRING("\"\""),
+    BOOLEAN,
+    NULL,
+    UNDEFINED,
+    NUMBER,
+    STRING,
     // SYMBOL // unused
-    OBJECT("{}"),
-    ARRAY("[]"),
+    OBJECT,
+    ARRAY,
 
     // Non-JavaScript, added for convenience
-    FUNCTION("function(){}"),
-    ENUM("{}"),
-    ENUM_MEMBER("{}")
+    FUNCTION,
+    ENUM,
+    ENUM_MEMBER
     ;
-
-    public final String defaultValue;
+    
     public Class containingType = null;
-
-    Type(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
 
     public boolean isBoolean() {
         return this.equals(BOOLEAN);
