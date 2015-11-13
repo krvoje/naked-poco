@@ -6,6 +6,7 @@ import org.junit.runners.JUnit4;
 import org.nakedpojo.parser.ReflectionsParser;
 import org.nakedpojo.model.Author;
 import org.nakedpojo.model.Book;
+import org.nakedpojo.parser.TypeMirrorParser;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;

@@ -1,8 +1,5 @@
 package org.nakedpojo.utils;
 
-import org.nakedpojo.Messages;
-import org.nakedpojo.NakedParseException;
-
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
@@ -15,6 +12,7 @@ import java.util.List;
 
 import static org.nakedpojo.utils.Commons.equalsEither;
 import static org.nakedpojo.utils.Commons.isGetterName;
+import static org.nakedpojo.utils.Commons.isSetterName;
 
 public class TypeMirrorUtils {
 
@@ -22,10 +20,14 @@ public class TypeMirrorUtils {
     private final Elements elements;
     private final Messager messager;
 
+    private final TypeMirror STRING_TYPE;
+
     public TypeMirrorUtils(Types types, Elements elements, Messager messager) {
         this.types = types;
         this.elements = elements;
         this.messager = messager;
+
+        this.STRING_TYPE = elements.getTypeElement(java.lang.String.class.getCanonicalName()).asType();
     }
 
     public  boolean isNumeric(Element element) {
@@ -43,15 +45,13 @@ public class TypeMirrorUtils {
     }
 
     public boolean isPrimitive(Element element) {
-        TypeMirror stringType = elements.getTypeElement(java.lang.String.class.getCanonicalName()).asType();
         return element.asType().getKind().isPrimitive()
-                || types.isSameType(element.asType(), stringType);
+                || types.isSameType(element.asType(), STRING_TYPE);
     }
 
     public boolean isString(Element element) {
-        TypeMirror stringType = elements.getTypeElement(java.lang.String.class.getCanonicalName()).asType();
         return element.asType().getKind().equals(TypeKind.CHAR)
-                || types.isSameType(element.asType(), stringType);
+                || types.isSameType(element.asType(), STRING_TYPE);
     }
 
     public boolean isBoolean(Element element) {
@@ -73,18 +73,20 @@ public class TypeMirrorUtils {
                 || types.isSubtype(element.asType(), types.getDeclaredType(list));
     }
 
-    public String typeName(Element clazz) {
-        if(clazz == null) throw new NakedParseException(Messages.elementIsNull());
-        return clazz.asType().getKind().equals(TypeKind.EXECUTABLE) ?
-                ((ExecutableElement)clazz).getReturnType().toString()
-                : clazz.toString();
+    public String fieldName(Element element) {
+        return element.getSimpleName().toString();
     }
 
-    public String simpleName(Element clazz) {
-        if(clazz == null) throw new NakedParseException(Messages.elementIsNull());
-        return clazz.asType().getKind().equals(TypeKind.EXECUTABLE) ?
-                ((ExecutableElement)clazz).getSimpleName().toString()
-                : clazz.getSimpleName().toString();
+    public String typeName(Element element) {
+        return element.asType().getKind().equals(TypeKind.EXECUTABLE) ?
+                ((ExecutableElement)element).getReturnType().toString()
+                : element.toString();
+    }
+
+    public String simpleName(Element element) {
+        return element.asType().getKind().equals(TypeKind.EXECUTABLE) ?
+                ((ExecutableElement)element).getSimpleName().toString()
+                : element.getSimpleName().toString();
     }
 
     public List<Element> publicFields(Element element) {
@@ -107,24 +109,35 @@ public class TypeMirrorUtils {
         return nestedClasses;
     }
 
+    public boolean isGetter(Element element) {
+        return isGetterName(fieldName(element))
+                && element.asType().getKind().equals(TypeKind.EXECUTABLE)
+                && element.getModifiers().contains(Modifier.PUBLIC)
+                && !((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)
+                && ((ExecutableElement) element).getParameters().isEmpty();
+    }
+
+    public boolean isSetter(Element element) {
+        return isGetterName(fieldName(element))
+                && element.asType().getKind().equals(TypeKind.EXECUTABLE)
+                && element.getModifiers().contains(Modifier.PUBLIC)
+                && ((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)
+                && ((ExecutableElement) element).getParameters().size() == 1;
+    }
+
     public List<ExecutableElement> getters(Element element) {
-        List<ExecutableElement> getters = new ArrayList<ExecutableElement>();
+        List<ExecutableElement> getters = new ArrayList<>();
         for(Element enclosed: element.getEnclosedElements()) {
-            if(element instanceof ExecutableElement) {
-                ExecutableElement executableElement = (ExecutableElement) element;
-                TypeKind typeKind = element.asType().getKind();
-                String name = element.getSimpleName().toString();
-                element.getModifiers();
-                if(isGetterName(name)
-                        && typeKind.equals(TypeKind.EXECUTABLE)
-                        && element.getModifiers().contains(Modifier.PUBLIC)
-                        && !executableElement.getReturnType().getKind().equals(TypeKind.VOID)
-                        && executableElement.getParameters().isEmpty()
-                        ) {
-                    getters.add((ExecutableElement)enclosed);
-                }
-            }
+            if(isGetter(enclosed)) getters.add((ExecutableElement)enclosed);
         }
         return getters;
+    }
+
+    public List<ExecutableElement> setters(Element element) {
+        List<ExecutableElement> setters = new ArrayList<>();
+        for(Element enclosed: element.getEnclosedElements()) {
+            if(isSetter(enclosed)) setters.add((ExecutableElement)enclosed);
+        }
+        return setters;
     }
 }

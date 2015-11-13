@@ -1,3 +1,18 @@
+defaultValue(member) ::= <<
+<if(member.type.boolean)>false<\\>
+<elseif(member.type.null)>null<\\>
+<elseif(member.type.undefined)>undefined<\\>
+<elseif(member.type.number)>0<\\>
+<elseif(member.type.string)>""<\\>
+<elseif(member.type.object)>{}<\\>
+<elseif(member.type.array)>[]<\\>
+<elseif(member.type.function)>function(){}<\\>
+<elseif(member.type.enum)>{}<\\>
+<elseif(member.type.enumMember)>{}<\\>
+<else>undefined<\\>
+<endif>
+>>
+
 csv(members) ::= <<
 <trunc(members): {member|
     "<member.fieldName>",
@@ -10,20 +25,14 @@ var <jsObj.typeName> = [
 ];
 >>
 
-Observable(member) ::= "self.<member.fieldName>=ko.observable(<member.type.defaultValue>);"
-
-ArrayObservable(member) ::="self.<member.fieldName>=ko.observableArray(<member.type.defaultValue>);"
+Field(member) ::= "self.<member.fieldName>=<defaultValue(member.type)>;"
 
 Function(jsObj) ::= <<
 function <jsObj.typeName>() {
     self = this;
 
 <jsObj.members: {member|
-<if(member.type.array)>
-    <ArrayObservable(member)>
-<else>
-    <Observable(member)>
-<endif>
+<Field(member)>
 }>
     self.update = function(dto) {
 <jsObj.members: {member|

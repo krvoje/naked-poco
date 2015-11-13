@@ -8,7 +8,9 @@ import org.nakedpojo.model.javascript.Type;
 import org.nakedpojo.utils.TypeMirrorUtils;
 
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -20,7 +22,6 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     // TODO: Constructor elements
     // TODO: Generics
 
-    // Maps fully qualified class names to JSTypes, since TypeMirror is something quite exotic
     private final Map<Element, JSType> prototypes;
 
     private final Types types;
@@ -41,11 +42,11 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         });
     }
 
-    public JSType convert(Element clazz) {
-        if(clazz == null)
+    public JSType convert(Element element) {
+        if(element == null)
             throw new NakedParseException(Messages.elementIsNull());
-        String fieldName = clazz.getSimpleName().toString();
-        return convert(clazz, fieldName);
+        String fieldName = utils.fieldName(element);
+        return convert(element, fieldName);
     }
 
     public JSType convert(Element element, String fieldName) {
@@ -57,7 +58,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     public void scan(Element element) {
         if(!prototypes.containsKey(element))
-            prototypes.put(element, new JSType(element.getSimpleName().toString()));
+            prototypes.put(element, new JSType(utils.fieldName(element)));
         else
             return;
 
@@ -86,6 +87,11 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         else {
             for(ExecutableElement getter: utils.getters(element)) {
                 Element returnTypeClass = types.asElement(getter.getReturnType());
+                members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
+            }
+
+            for(ExecutableElement setter : utils.setters(element)) {
+                Element returnTypeClass = types.asElement(setter.getReturnType());
                 members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
             }
 

@@ -1,0 +1,49 @@
+defaultValue(member) ::= <<
+<if(member.type.boolean)>false<elseif(member.type.null)>null<elseif(member.type.undefined)>undefined<elseif(member.type.number)>0<elseif(member.type.string)>""<elseif(member.type.object)>{}<elseif(member.type.array)>[]<elseif(member.type.function)>function(){}<elseif(member.type.enum)>{}<elseif(member.type.enumMember)>{}<else>undefined<endif>
+>>
+
+csv(members) ::= <<
+<trunc(members): {member|
+    "<member.fieldName>",
+    "<last(jsObj.members).fieldName>"}>
+>>
+
+Enum(jsObj)::= <<
+var <jsObj.typeName> = [
+<csv(jsObj.members)>
+];
+>>
+
+Observable(member) ::= "self.<member.fieldName>=ko.observable(<defaultValue(member)>);"
+
+ArrayObservable(member) ::="self.<member.fieldName>=ko.observableArray(<defaultValue(member)>);"
+
+Function(jsObj) ::= <<
+function <jsObj.typeName>() {
+    self = this;
+
+<jsObj.members: {member|
+<if(member.type.array)>
+    <ArrayObservable(member)>
+<else>
+    <Observable(member)>
+<endif>
+}>
+    self.update = function(dto) {
+<jsObj.members: {member|
+        self.<member.fieldName>(dto.<member.fieldName>);
+    }>    }
+
+    self.dto = function() {
+        return ko.toJS(self);
+    }
+}
+>>
+
+JavaScriptObject(jsObj) ::= <<
+<if(jsObj.type.enum)>
+    <Enum(jsObj)>
+<else>
+    <Function(jsObj)>
+<endif>
+>>

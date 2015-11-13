@@ -5,26 +5,62 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
+
+    public enum TemplateType {
+        DEFAULT("KnockoutObservableTemplates.stg"),
+        KNOCKOUT_JS("KnockoutObservableTemplates.stg"),
+        PLAIN_JAVASCRIPT("PlainJavaScriptTemplates.stg"),
+        CUSTOM("");
+
+        private String templateFilename;
+        private TemplateType(String templateFilename) {
+            this.templateFilename = templateFilename;
+        }
+
+        TemplateType  withFilename(String templateFilename) {
+            this.templateFilename = templateFilename;
+            return this;
+        }
+    }
 
     // TODO: Use a custom comparator here as well.
     private final Set<SOURCE_TYPE> targets = new HashSet<SOURCE_TYPE>();
 
     private final Parser<SOURCE_TYPE, METADATA_TYPE> parser;
-    private final STGroupFile stGroupFile = new STGroupFile(DEFAULT_TEMPLATE_FILE);
+    private final TemplateType templateType;
+    private final STGroupFile stGroupFile;
 
-    private static String DEFAULT_TEMPLATE_FILE = "NakedPojoTemplates.stg";
-
-    public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser) {
+    public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, TemplateType templateType, SOURCE_TYPE... targets) {
         this.parser = parser;
+        this.templateType = templateType;
+        this.stGroupFile = new STGroupFile(this.templateType.templateFilename);
+
+        if(targets != null)
+        for(SOURCE_TYPE target : targets)
+            this.targets.add(target);
     }
 
     public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, SOURCE_TYPE... targets) {
-        this(parser);
-        for(SOURCE_TYPE target : targets)
-            this.targets.add(target);
+        this(parser, TemplateType.DEFAULT, targets);
+    }
+
+    public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, String customTemplateFilename, SOURCE_TYPE... targets) {
+        this.parser = parser;
+        this.templateType = TemplateType.CUSTOM.withFilename(customTemplateFilename);
+        this.stGroupFile = new STGroupFile(customTemplateFilename);
+
+        if(targets != null)
+            for(SOURCE_TYPE target : targets)
+                scan(target);
+
+        for(Map.Entry<SOURCE_TYPE, METADATA_TYPE> e: parser.prototypes().entrySet()) {
+            SOURCE_TYPE key = e.getKey();
+            if(!this.targets.contains(key)) this.targets.add(key);
+        }
     }
 
     public void scan(SOURCE_TYPE clazz) {
