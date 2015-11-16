@@ -44,8 +44,36 @@ public class ReflectionUtils {
         return fieldNameFromGetterOrSetter(name);
     }
 
+    public static boolean isIterable(Class clazz) {
+        return clazz.isArray() || isSubclassOf(clazz, Iterable.class);
+    }
+
+    public static boolean isPrimitive(Class clazz) {
+        return clazz.isPrimitive()
+            || equalsEitherCanonicalName(clazz, String.class);
+    }
+
+    public static boolean isString(Class clazz) {
+        return equalsEitherCanonicalName(clazz,
+                String.class,
+                Character.class,
+                char.class);
+    }
+
+    public static boolean isBoolean(Class clazz) {
+        return equalsEitherCanonicalName(clazz,
+                Boolean.class,
+                boolean.class);
+    }
+
+    public static boolean isByte(Class clazz) {
+        return equalsEitherCanonicalName(clazz,
+                Byte.class,
+                byte.class);
+    }
+
     public static boolean isNumeric(Class clazz) {
-        return equalsEither(clazz,
+        return equalsEitherCanonicalName(clazz,
                 java.lang.Short.class,
                 short.class,
                 java.lang.Integer.class,
@@ -82,5 +110,15 @@ public class ReflectionUtils {
         if(clazz.getSuperclass() == null) return false;
         if(clazz.isAssignableFrom(superClazz)) return true;
         return isSubclassOf(clazz.getSuperclass(), superClazz);
+    }
+
+    public static boolean equalsEitherCanonicalName(Class clazz, Class ... clazzez) {
+        if(nullOrEmpty(clazzez)) return true;
+        for(Class c: clazzez) {
+            if(clazz.getCanonicalName().equals(c.getCanonicalName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

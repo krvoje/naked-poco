@@ -40,7 +40,7 @@ public class ReflectionsParser implements Parser<Class, JSType>
 
         List<JSType> members = new ArrayList<JSType>();
 
-        if(either(clazz.isPrimitive(), clazz.equals(String.class))) {
+        if(isPrimitive(clazz)) {
             prototypes.put(clazz, convertPrimitive(clazz));
         }
         else if(clazz.isEnum()) {
@@ -53,11 +53,14 @@ public class ReflectionsParser implements Parser<Class, JSType>
                         .withType(Type.ENUM)
                         .withMembers(members.toArray(new JSType[members.size()])));
         }
-        else if(clazz.isArray() || isSubclassOf(clazz, Iterable.class)) {
+        else if(isIterable(clazz)) {
             // TODO: fix, this renders differently than it should
             prototypes.put(clazz, jsType.withType(Type.ARRAY));
         }
         else {
+            jsType = jsType.withType(Type.OBJECT);
+            prototypes.put(clazz, jsType);
+
             for(Method getter: getters(clazz)) {
                 Class getterClazz = getter.getReturnType();
                 members.add(convert(getterClazz, fieldName(getter)));
@@ -73,26 +76,18 @@ public class ReflectionsParser implements Parser<Class, JSType>
             }
 
             prototypes.put(clazz, jsType
-                    .withType(Type.OBJECT)
                     .withMembers(members));
         }
     }
 
     private static JSType convertPrimitive(Class clazz) {
-        if(equalsEither(clazz,
-                java.lang.Boolean.class,
-                boolean.class)) {
+        if(isBoolean(clazz)) {
             return new JSType(clazz.getSimpleName(), Type.BOOLEAN);
         }
-        else if(equalsEither(clazz,
-                java.lang.Character.class,
-                char.class,
-                String.class)) {
+        else if(isString(clazz)) {
             return new JSType(clazz.getSimpleName(), Type.STRING);
         }
-        else if(equalsEither(clazz,
-                java.lang.Byte.class,
-                byte.class)){
+        else if(isByte(clazz)){
             // TODO: implement
             return new JSType(clazz.getSimpleName(), Type.UNDEFINED);
         }
@@ -110,5 +105,10 @@ public class ReflectionsParser implements Parser<Class, JSType>
 
     public Map<Class, JSType> prototypes() {
         return this.prototypes;
+    }
+
+    private void update(Class clazz, JSType jsType) {
+        if(!prototypes.containsKey(clazz))
+            prototypes.put(clazz, jsType);
     }
 }

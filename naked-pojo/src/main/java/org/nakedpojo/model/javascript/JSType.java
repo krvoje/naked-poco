@@ -8,11 +8,14 @@ public class JSType {
     private final Type type;
     private final JSType[] members;
 
-    public JSType(String typeName) {
-        this(typeName, typeName, Type.UNDEFINED);
+    public JSType(String typeName, String fieldName, Type type, JSType... members) {
+        this.typeName = typeName;
+        this.fieldName = fieldName;
+        this.type = type;
+        this.members = members;
     }
 
-    public JSType(String typeName, Type type) {
+    public JSType(String typeName) {
         this(typeName, typeName, Type.UNDEFINED);
     }
 
@@ -20,15 +23,12 @@ public class JSType {
         this(typeName, fieldName, Type.UNDEFINED);
     }
 
-    public JSType(String fieldName, Type type, JSType... members) {
-        this(fieldName, fieldName, type, members);
+    public JSType(String typeName, Type type) {
+        this(typeName, typeName, type);
     }
 
-    public JSType(String typeName, String fieldName, Type type, JSType... members) {
-        this.typeName = typeName;
-        this.fieldName = fieldName;
-        this.type = type;
-        this.members = members;
+    public JSType(String fieldName, Type type, JSType... members) {
+        this(fieldName, fieldName, type, members);
     }
 
     public JSType withName(String fieldName) {

@@ -10,11 +10,13 @@ public class Author {
     public final String surname;
     public final Book book;
     public final List<Book> books;
+    public final boolean prolific;
 
-    public Author(String name, String surname, Book book, List<Book> books) {
+    public Author(String name, String surname, Book book, List<Book> books, boolean prolific) {
         this.name = name;
         this.surname = surname;
         this.book = book;
         this.books = books;
+        this.prolific = prolific;
     }
 }

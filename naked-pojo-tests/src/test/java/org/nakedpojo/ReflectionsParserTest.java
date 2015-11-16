@@ -2,7 +2,6 @@ package org.nakedpojo;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -10,8 +9,10 @@ import org.nakedpojo.model.Author;
 import org.nakedpojo.model.Book;
 import org.nakedpojo.parser.ReflectionsParser;
 
+import java.io.InputStream;
+
+//@Ignore
 @RunWith(JUnit4.class)
-@Ignore
 public class ReflectionsParserTest {
 
     @Test
@@ -29,7 +30,13 @@ public class ReflectionsParserTest {
         Assert.assertEquals(fileText("Genre_knockout_expected.js"), genreJS);
     }
 
-    private static String fileText(String filename) throws Exception {
-        return IOUtils.toString(ReflectionsParser.class.getResourceAsStream("/"+filename));
+    static String fileText(String filename) throws Exception {
+        InputStream file;
+        file = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
+        if(file == null)
+            file = ReflectionsParserTest.class.getResourceAsStream(filename);
+        if(file == null)
+            System.out.println("Error loading " + filename);
+        return IOUtils.toString(file);
     }
 }

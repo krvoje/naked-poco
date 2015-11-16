@@ -58,6 +58,7 @@ public class TypeMirrorUtils {
     }
 
     public boolean isString(Element element) {
+        System.out.println(element.asType().getKind() + ", " + STRING_TYPE);
         return element.asType().getKind().equals(TypeKind.CHAR)
                 || types.isSameType(element.asType(), STRING_TYPE);
     }

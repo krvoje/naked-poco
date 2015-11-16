@@ -27,6 +27,9 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
         }
     }
 
+    private static final String JS_TEMPLATE = "JavaScriptObject";
+    private static final String JS_INSTANCE_TEMPLATE = "jsObj";
+
     // TODO: Use a custom comparator here as well.
     private final Set<SOURCE_TYPE> targets = new HashSet<SOURCE_TYPE>();
 
@@ -70,8 +73,8 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
 
     public String render(SOURCE_TYPE clazz) {
         if(!targets.contains(clazz)) targets.add(clazz);
-        ST template = stGroupFile.getInstanceOf("JavaScriptObject");
-        template.add("jsObj", parser.convert(clazz));
+        ST template = stGroupFile.getInstanceOf(JS_TEMPLATE);
+        template.add(JS_INSTANCE_TEMPLATE, parser.convert(clazz));
         return template.render();
     }
 

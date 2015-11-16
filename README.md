@@ -5,7 +5,7 @@ A Java-to-JavaScript DTO generator. Still heavily a work in progress.
 Use case example:
 
 ```Java
-package org.nakedpojo.model;
+package org.nakedpojo.model.model;
 
 import org.nakedpojo.annotations.Naked;
 

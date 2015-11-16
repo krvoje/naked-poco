@@ -1,15 +1,15 @@
 package org.nakedpojo;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.nakedpojo.model.Author;
-import org.nakedpojo.model.Book;
-import org.nakedpojo.parser.ReflectionsParser;
+
+import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
+
+
 
 @RunWith(JUnit4.class)
 public class TypeMirrorParserTest {
@@ -17,17 +17,27 @@ public class TypeMirrorParserTest {
     @Test
     public void knockoutPerClass() throws Exception {
 
+        // Just a dummy invocation to get the needed stuff to classpath
+
         // Classes should be in generated-sources at this point
 
+        ClassLoader cl = TypeMirrorParserTest.class.getClassLoader();
+
         assertEquals(fileText("Book_knockout_expected.js"),
-                fileText("Book.js"));
+                fileText("generated-test-sources/test-annotations/Book.js"));
         assertEquals(fileText("Author_knockout_expected.js"),
-                fileText("Author.js"));
+                fileText("generated-test-sources/test-annotations/Author.js"));
         assertEquals(fileText("Genre_knockout_expected.js"),
-                fileText("Genre.js"));
+                fileText("generated-test-sources/test-annotations/Genre.js"));
     }
 
-    private static String fileText(String filename) throws Exception {
-        return IOUtils.toString(ReflectionsParser.class.getResourceAsStream("/"+filename));
+    static String fileText(String filename) throws Exception {
+        InputStream file;
+        file = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
+        if(file == null)
+            file = TypeMirrorParserTest.class.getResourceAsStream(filename);
+        if(file == null)
+            System.out.println("Error loading " + filename);
+        return IOUtils.toString(file);
     }
 }

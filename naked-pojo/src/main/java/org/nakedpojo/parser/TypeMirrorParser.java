@@ -79,6 +79,9 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             prototypes.put(element, prototype.withType(Type.ARRAY));
         }
         else if(utils.isClass(element)) {
+            prototype = prototype.withType(Type.OBJECT);
+            prototypes.put(element, prototype);
+
             for(ExecutableElement getter: utils.getters(element)) {
                 Element returnTypeClass = types.asElement(getter.getReturnType());
                 members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
@@ -98,7 +101,6 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             }
 
             prototypes.put(element, prototype
-                    .withType(Type.OBJECT)
                     .withMembers(members));
         }
         // TODO: Any other type of class?
