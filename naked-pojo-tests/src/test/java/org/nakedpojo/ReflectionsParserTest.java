@@ -11,6 +11,8 @@ import org.nakedpojo.parser.ReflectionsParser;
 
 import java.io.InputStream;
 
+import static org.nakedpojo.TestUtils.fileText;
+
 //@Ignore
 @RunWith(JUnit4.class)
 public class ReflectionsParserTest {
@@ -30,13 +32,18 @@ public class ReflectionsParserTest {
         Assert.assertEquals(fileText("Genre_knockout_expected.js"), genreJS);
     }
 
-    static String fileText(String filename) throws Exception {
-        InputStream file;
-        file = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
-        if(file == null)
-            file = ReflectionsParserTest.class.getResourceAsStream(filename);
-        if(file == null)
-            System.out.println("Error loading " + filename);
-        return IOUtils.toString(file);
+    @Test
+    public void javascriptPerClass() throws Exception {
+        NakedPojo np = new NakedPojo(new ReflectionsParser(),
+                NakedPojo.TemplateType.PLAIN_JAVASCRIPT,
+                Book.class, Author.class, Book.Genre.class);
+
+        String bookJS = np.render(Book.class);
+        String authorJS = np.render(Author.class);
+        String genreJS = np.render(Book.Genre.class);
+
+        Assert.assertEquals(fileText("Book_javascript_expected.js"), bookJS);
+        Assert.assertEquals(fileText("Author_javascript_expected.js"), authorJS);
+        Assert.assertEquals(fileText("Genre_javascript_expected.js"), genreJS);
     }
 }

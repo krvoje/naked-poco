@@ -16,7 +16,7 @@ defaultValue(member) ::= <<
 csv(members) ::= <<
 <trunc(members): {member|
     "<member.fieldName>",
-    "<last(jsObj.members).fieldName>"}>
+}>    "<last(jsObj.members).fieldName>"
 >>
 
 Enum(jsObj)::= <<
@@ -43,7 +43,7 @@ function <jsObj.typeName>() {
     self.update = function(dto) {
 <jsObj.members: {member|
         self.<member.fieldName>(dto.<member.fieldName>);
-    }>    }
+}>    }
 
     self.dto = function() {
         return ko.toJS(self);

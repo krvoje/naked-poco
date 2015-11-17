@@ -21,7 +21,7 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
             this.templateFilename = templateFilename;
         }
 
-        TemplateType  withFilename(String templateFilename) {
+        TemplateType withFilename(String templateFilename) {
             this.templateFilename = templateFilename;
             return this;
         }

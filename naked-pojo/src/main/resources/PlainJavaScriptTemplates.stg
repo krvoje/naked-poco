@@ -7,7 +7,7 @@ defaultValue(member) ::= <<
 <elseif(member.type.object)>{}<\\>
 <elseif(member.type.array)>[]<\\>
 <elseif(member.type.function)>function(){}<\\>
-<elseif(member.type.enum)>{}<\\>
+<elseif(member.type.enum)>""<\\>
 <elseif(member.type.enumMember)>{}<\\>
 <else>undefined<\\>
 <endif>
@@ -16,7 +16,13 @@ defaultValue(member) ::= <<
 csv(members) ::= <<
 <trunc(members): {member|
     "<member.fieldName>",
-    "<last(jsObj.members).fieldName>"}>
+}>    "<last(jsObj.members).fieldName>"
+>>
+
+csvFields(members) ::= <<
+<trunc(members): {member|
+    self.<member.fieldName>,
+}>    self.<last(jsObj.members).fieldName>
 >>
 
 Enum(jsObj)::= <<
@@ -25,7 +31,7 @@ var <jsObj.typeName> = [
 ];
 >>
 
-Field(member) ::= "self.<member.fieldName>=<defaultValue(member.type)>;"
+Field(member) ::= "self.<member.fieldName>=<defaultValue(member)>;"
 
 Function(jsObj) ::= <<
 function <jsObj.typeName>() {
@@ -36,11 +42,13 @@ function <jsObj.typeName>() {
 }>
     self.update = function(dto) {
 <jsObj.members: {member|
-        self.<member.fieldName>(dto.<member.fieldName>);
-    }>    }
+        self.<member.fieldName>=dto.<member.fieldName>;
+}>    }
 
     self.dto = function() {
-        return ko.toJS(self);
+        return JSON.stringify({
+        <csvFields(jsObj.members)>
+        });
     }
 }
 >>

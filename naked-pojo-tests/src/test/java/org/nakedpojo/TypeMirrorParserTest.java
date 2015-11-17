@@ -8,7 +8,7 @@ import org.junit.runners.JUnit4;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.nakedpojo.TestUtils.fileText;
 
 
 @RunWith(JUnit4.class)
@@ -29,15 +29,5 @@ public class TypeMirrorParserTest {
                 fileText("generated-test-sources/test-annotations/Author.js"));
         assertEquals(fileText("Genre_knockout_expected.js"),
                 fileText("generated-test-sources/test-annotations/Genre.js"));
-    }
-
-    static String fileText(String filename) throws Exception {
-        InputStream file;
-        file = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
-        if(file == null)
-            file = TypeMirrorParserTest.class.getResourceAsStream(filename);
-        if(file == null)
-            System.out.println("Error loading " + filename);
-        return IOUtils.toString(file);
     }
 }
