@@ -149,11 +149,6 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         }
     }
 
-    private void note(String string) {
-        System.out.println(string);
-        messager.printMessage(Diagnostic.Kind.NOTE, string);
-    }
-
     public Map<Element, JSType> prototypes() {
         return this.prototypes;
     }
