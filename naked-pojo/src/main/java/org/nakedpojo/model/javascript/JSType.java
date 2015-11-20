@@ -2,17 +2,23 @@ package org.nakedpojo.model.javascript;
 
 import java.util.*;
 
+import static java.util.Arrays.asList;
+
 public class JSType {
     private final String typeName;
     private final String fieldName;
     private final Type type;
-    private final JSType[] members;
+    private final List<JSType> members = new ArrayList<>();
 
-    public JSType(String typeName, String fieldName, Type type, JSType... members) {
+    public JSType(String typeName, String fieldName, Type type, Collection<JSType> members) {
         this.typeName = typeName;
         this.fieldName = fieldName;
         this.type = type;
-        this.members = members;
+        this.members.addAll(members);
+    }
+
+    public JSType(String typeName, String fieldName, Type type, JSType ... members) {
+        this(typeName, fieldName, type, asList(members));
     }
 
     public JSType(String typeName) {
@@ -27,7 +33,11 @@ public class JSType {
         this(typeName, typeName, type);
     }
 
-    public JSType(String fieldName, Type type, JSType... members) {
+    public JSType(String fieldName, Type type, JSType ... members) {
+        this(fieldName, fieldName, type, members);
+    }
+
+    public JSType(String fieldName, Type type, Collection<JSType> members) {
         this(fieldName, fieldName, type, members);
     }
 
@@ -59,7 +69,7 @@ public class JSType {
         return this.type;
     }
 
-    public JSType[] getMembers() {
+    public List<JSType> getMembers() {
         return this.members;
     }
 }

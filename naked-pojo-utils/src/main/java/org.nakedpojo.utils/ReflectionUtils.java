@@ -1,6 +1,5 @@
 package org.nakedpojo.utils;
 
-import static org.nakedpojo.utils.Commons.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ public class ReflectionUtils {
 
     public static String fieldName(Method getterOrSetter) {
         String name = getterOrSetter.getName();
-        return fieldNameFromGetterOrSetter(name);
+        return Commons.fieldNameFromGetterOrSetter(name);
     }
 
     public static boolean isIterable(Class clazz) {
@@ -88,20 +87,20 @@ public class ReflectionUtils {
 
     public static boolean isGetter(Method method) {
         String name = method.getName();
-        return isGetterName(name)
+        return Commons.isGetterName(name)
                 && !method.getReturnType().equals(Void.class);
     }
 
     public static boolean isSetter(Method method) {
         String name = method.getName();
-        return isSetterName(name)
+        return Commons.isSetterName(name)
                 && method.getReturnType().equals(Void.class);
     }
 
     public static boolean isSubclassOf(Class clazz, Class superClazz) {
         /// XXX: Incomplete, works just for internal implementation
         if(superClazz.isInterface()) {
-            if(contains(clazz.getInterfaces(), superClazz)) return true;
+            if(Commons.contains(clazz.getInterfaces(), superClazz)) return true;
             for(Class _interface: clazz.getInterfaces()) {
                 return isSubclassOf(_interface, superClazz);
             }
@@ -113,7 +112,7 @@ public class ReflectionUtils {
     }
 
     public static boolean equalsEitherCanonicalName(Class clazz, Class ... clazzez) {
-        if(nullOrEmpty(clazzez)) return true;
+        if(Commons.nullOrEmpty(clazzez)) return true;
         for(Class c: clazzez) {
             if(clazz.getCanonicalName().equals(c.getCanonicalName())) {
                 return true;

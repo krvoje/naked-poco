@@ -6,14 +6,9 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import static org.nakedpojo.utils.Commons.equalsEither;
-import static org.nakedpojo.utils.Commons.isGetterName;
-import static org.nakedpojo.utils.Commons.isSetterName;
 
 public class TypeMirrorUtils {
 
@@ -21,7 +16,9 @@ public class TypeMirrorUtils {
     private final Elements elements;
     private final Messager messager;
 
+    // Quazi-constants, since this cannot be a static util class
     private final TypeMirror STRING_TYPE;
+    private final TypeMirror OBJECT_TYPE;
 
     public final Comparator<Element> TYPE_NAME_COMPARATOR = new Comparator<Element>() {
         @Override
@@ -36,10 +33,11 @@ public class TypeMirrorUtils {
         this.messager = messager;
 
         this.STRING_TYPE = elements.getTypeElement(java.lang.String.class.getCanonicalName()).asType();
+        this.OBJECT_TYPE = elements.getTypeElement(java.lang.Object.class.getCanonicalName()).asType();
     }
 
     public  boolean isNumeric(Element element) {
-        return equalsEither(element.asType().getKind(),
+        return Commons.equalsEither(element.asType().getKind(),
                 TypeKind.SHORT,
                 TypeKind.INT,
                 TypeKind.LONG,
@@ -83,7 +81,8 @@ public class TypeMirrorUtils {
     }
 
     public boolean isClass(Element element) {
-        return element.getKind().isClass();
+        return element.getKind().isClass()
+            || element.getKind().isInterface();
     }
 
     public String fieldName(Element element) {
@@ -97,9 +96,24 @@ public class TypeMirrorUtils {
     }
 
     public String simpleName(Element element) {
-        return element.asType().getKind().equals(TypeKind.EXECUTABLE) ?
-                ((ExecutableElement)element).getSimpleName().toString()
-                : element.getSimpleName().toString();
+        if(element.asType().getKind().equals(TypeKind.EXECUTABLE)) {
+            return ((ExecutableElement)element).getSimpleName().toString();
+        } else {
+            return element.getSimpleName().toString();
+        }
+    }
+
+    public List<Element> supertypeElements(Element element) {
+        List<Element> supertypeElements = new ArrayList<>();
+        System.out.println(types.directSupertypes(element.asType()));
+        System.out.println(types.directSupertypes(element.asType()));
+        for(TypeMirror tm: types.directSupertypes(element.asType())) {
+            // Upon encountering Object, for heaven's sake stop
+            if(types.isSameType(tm, OBJECT_TYPE))
+                break;
+            supertypeElements.add(types.asElement(tm));
+        }
+        return supertypeElements;
     }
 
     public List<Element> publicFields(Element element) {
@@ -123,7 +137,7 @@ public class TypeMirrorUtils {
     }
 
     public boolean isGetter(Element element) {
-        return isGetterName(fieldName(element))
+        return Commons.isGetterName(fieldName(element))
                 && element.asType().getKind().equals(TypeKind.EXECUTABLE)
                 && element.getModifiers().contains(Modifier.PUBLIC)
                 && !((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)
@@ -131,7 +145,7 @@ public class TypeMirrorUtils {
     }
 
     public boolean isSetter(Element element) {
-        return isGetterName(fieldName(element))
+        return Commons.isGetterName(fieldName(element))
                 && element.asType().getKind().equals(TypeKind.EXECUTABLE)
                 && element.getModifiers().contains(Modifier.PUBLIC)
                 && ((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)

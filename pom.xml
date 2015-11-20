@@ -12,6 +12,7 @@
     <modules>
         <module>naked-pojo</module>
         <module>naked-pojo-tests</module>
+        <module>naked-pojo-utils</module>
     </modules>
 
     <dependencyManagement>
@@ -19,6 +20,11 @@
             <dependency>
                 <groupId>org.krvoje</groupId>
                 <artifactId>naked-pojo</artifactId>
+                <version>${naked-pojo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.krvoje</groupId>
+                <artifactId>naked-pojo-utils</artifactId>
                 <version>${naked-pojo.version}</version>
             </dependency>
             <dependency>

@@ -82,28 +82,55 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             prototype = prototype.withType(Type.OBJECT);
             prototypes.put(element, prototype);
 
-            for(ExecutableElement getter: utils.getters(element)) {
-                Element returnTypeClass = types.asElement(getter.getReturnType());
-                members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
+            // Scan all supertype elements and add them to this class' prototype
+            for(Element superTypeElement : utils.supertypeElements(element)) {
+                scan(superTypeElement);
+
+                processGetters(superTypeElement, prototype);
+                processSetters(superTypeElement, prototype);
+                processPublicFields(superTypeElement, prototype);
+                processNestedClasses(superTypeElement, prototype);
             }
 
-            for(ExecutableElement setter : utils.setters(element)) {
-                Element returnTypeClass = types.asElement(setter.getReturnType());
-                members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
-            }
-
-            for (Element field : utils.publicFields(element)) {
-                members.add(convert(field, utils.simpleName(field)));
-            }
-
-            for (Element nestedClass : utils.nestedClasses(element)) {
-                scan(nestedClass);
-            }
+            processGetters(element, prototype);
+            processSetters(element, prototype);
+            processPublicFields(element, prototype);
+            processNestedClasses(element, prototype);
 
             prototypes.put(element, prototype
                     .withMembers(members));
         }
-        // TODO: Any other type of class?
+        // Any other type of class?
+    }
+
+    private void processGetters(Element element, JSType prototype) {
+        List<JSType> members = prototype.getMembers();
+        for(ExecutableElement getter: utils.getters(element)) {
+            Element returnTypeClass = types.asElement(getter.getReturnType());
+            members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
+        }
+    }
+
+    private void processSetters(Element element, JSType prototype) {
+        List<JSType> members = prototype.getMembers();
+        for(ExecutableElement setter : utils.setters(element)) {
+            Element returnTypeClass = types.asElement(setter.getReturnType());
+            members.add(convert(returnTypeClass, utils.simpleName(returnTypeClass)));
+        }
+    }
+
+    private void processPublicFields(Element element, JSType prototype) {
+        List<JSType> members = prototype.getMembers();
+        for (Element field : utils.publicFields(element)) {
+            members.add(convert(field, utils.simpleName(field)));
+        }
+    }
+
+    private void processNestedClasses(Element element, JSType prototype) {
+        List<JSType> members = prototype.getMembers();
+        for (Element nestedClass : utils.nestedClasses(element)) {
+            scan(nestedClass);
+        }
     }
 
     private JSType convertPrimitive(Element element) {
