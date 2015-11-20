@@ -5,7 +5,7 @@ import org.nakedpojo.annotations.Naked;
 import java.util.List;
 
 @Naked
-public class Author {
+public class Author implements HumanInterface {
     public final String name;
     public final String surname;
     public final Book book;
@@ -18,5 +18,11 @@ public class Author {
         this.book = book;
         this.books = books;
         this.prolific = prolific;
+    }
+
+
+    @Override
+    public String getIdNumber() {
+        return "123123";
     }
 }

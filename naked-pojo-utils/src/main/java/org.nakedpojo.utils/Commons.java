@@ -2,9 +2,9 @@ package org.nakedpojo.utils;
 
 public class Commons {
 
-    private static final String GET = "get";
-    private static final String SET = "set";
-    private static final String IS = "is";
+    public static final String GET_PREFIX = "get";
+    public static final String SET_PREFIX = "set";
+    public static final String IS_PREFIX = "is";
 
     public static <T> boolean nullOrEmpty(T[] objs) {
         return objs==null || objs.length ==0;
@@ -53,24 +53,24 @@ public class Commons {
     }
 
     public static String fieldNameFromGetterOrSetter(String methodName) {
-        if(methodName.startsWith(GET)) {
-            return lowercaseFirst(methodName.substring(GET.length()));
-        } else if(methodName.startsWith(IS)) {
-            return lowercaseFirst(methodName.substring(IS.length()));
-        } else if(methodName.startsWith(SET)) {
-            return lowercaseFirst(methodName.substring(SET.length()));
+        if(methodName.startsWith(GET_PREFIX)) {
+            return lowercaseFirst(methodName.substring(GET_PREFIX.length()));
+        } else if(methodName.startsWith(IS_PREFIX)) {
+            return lowercaseFirst(methodName.substring(IS_PREFIX.length()));
+        } else if(methodName.startsWith(SET_PREFIX)) {
+            return lowercaseFirst(methodName.substring(SET_PREFIX.length()));
         } else {
             return methodName;
         }
     }
 
     public static boolean isGetterName(String name) {
-        return (name.startsWith(GET) || name.startsWith(IS))
-                && !name.equals(GET) && !name.equals(IS);
+        return (name.startsWith(GET_PREFIX) || name.startsWith(IS_PREFIX))
+                && !name.equals(GET_PREFIX) && !name.equals(IS_PREFIX);
     }
 
     public static boolean isSetterName(String name) {
-        return name.startsWith(SET)
-                && !name.equals(SET);
+        return name.startsWith(SET_PREFIX)
+                && !name.equals(SET_PREFIX);
     }
 }

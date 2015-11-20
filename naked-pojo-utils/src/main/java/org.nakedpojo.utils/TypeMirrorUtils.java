@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.nakedpojo.utils.Commons.fieldNameFromGetterOrSetter;
+
 public class TypeMirrorUtils {
 
     private final Types types;
@@ -89,6 +91,11 @@ public class TypeMirrorUtils {
         return element.getSimpleName().toString();
     }
 
+    public String fieldNameFromAccessor(ExecutableElement accessor) {
+        String fullName = accessor.getSimpleName().toString();
+        return fieldNameFromGetterOrSetter(fullName);
+    }
+
     public String typeName(Element element) {
         return element.asType().getKind().equals(TypeKind.EXECUTABLE) ?
                 ((ExecutableElement)element).getReturnType().toString()
@@ -105,10 +112,8 @@ public class TypeMirrorUtils {
 
     public List<Element> supertypeElements(Element element) {
         List<Element> supertypeElements = new ArrayList<>();
-        System.out.println(types.directSupertypes(element.asType()));
-        System.out.println(types.directSupertypes(element.asType()));
         for(TypeMirror tm: types.directSupertypes(element.asType())) {
-            // Upon encountering Object, for heaven's sake stop
+            // Upon encountering Object, stop (this will ignore interfaces)
             if(types.isSameType(tm, OBJECT_TYPE))
                 break;
             supertypeElements.add(types.asElement(tm));

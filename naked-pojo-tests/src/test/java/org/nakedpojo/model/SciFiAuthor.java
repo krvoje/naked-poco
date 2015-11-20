@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Naked
-public class SciFiAuthor extends Author {
+public class SciFiAuthor extends Author implements SciFiInterface {
 
     public final List<String> conventionsVisited = new ArrayList<>();
 
@@ -18,5 +18,15 @@ public class SciFiAuthor extends Author {
                        List<String> conventionsVisited) {
         super(name, surname, book, books, prolific);
         this.conventionsVisited.addAll(conventionsVisited);
+    }
+
+    @Override
+    public String getSubGenre() {
+        return "Steampunk";
+    }
+
+    @Override
+    public String getIdNumber() {
+        return "12312445";
     }
 }
