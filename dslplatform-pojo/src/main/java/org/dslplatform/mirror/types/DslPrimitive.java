@@ -1,5 +1,7 @@
 package org.dslplatform.mirror.types;
 
+import org.dslplatform.utils.ElementParseException;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +25,7 @@ public enum DslPrimitive implements DslType {
     , XML("xml")
     , LOCATION("location")
     , POINT("location")
+    , ENUM_MEMBER(null)
     ;
 
     private final String keyword;
@@ -39,5 +42,20 @@ public enum DslPrimitive implements DslType {
 
     public String getKeyword() {
         return keyword;
+    }
+
+    public boolean isMappedBy(String canonicalName) {
+        for(String domainElement: domain) {
+            if(canonicalName.equals(domainElement))
+                return true;
+        }
+        return false;
+    }
+
+    public static DslPrimitive forCanonicalName(String canonicalName) {
+        for(DslPrimitive dp: DslPrimitive.values()) {
+            if(dp.isMappedBy(canonicalName)) return dp;
+        }
+        throw new ElementParseException("Undefined primitive type mapping: " + canonicalName);
     }
 }

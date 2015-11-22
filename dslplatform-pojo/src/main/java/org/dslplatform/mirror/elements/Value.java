@@ -1,9 +1,11 @@
 package org.dslplatform.mirror.elements;
 
+import java.util.List;
+
 public class Value extends ModuleElement  {
 
-    public Value(String name, DslField... members) {
-        super(name);
+    public Value(String name, List<DslField> members) {
+        super(name, members);
     }
 
     @Override
@@ -16,7 +18,7 @@ public class Value extends ModuleElement  {
         return new Value(name, fields);
     }
 
-    public Value withFields(DslField[] fields) {
+    public Value withFields(List<DslField> fields) {
         return new Value(name, fields);
     }
 }

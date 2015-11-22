@@ -15,7 +15,7 @@ public class DslField extends DslPlatformElement {
     }
 
     public String getKeyword() {
-        return this.type.keyword;
+        return this.type.getKeyword();
     }
 
     public DslField withName(String name) {

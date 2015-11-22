@@ -38,7 +38,7 @@ public class TypeMirrorUtils {
         this.OBJECT_TYPE = elements.getTypeElement(java.lang.Object.class.getCanonicalName()).asType();
     }
 
-    public  boolean isNumeric(Element element) {
+    public boolean isNumeric(Element element) {
         return Commons.equalsEither(element.asType().getKind(),
                 TypeKind.SHORT,
                 TypeKind.INT,
@@ -47,7 +47,7 @@ public class TypeMirrorUtils {
                 TypeKind.DOUBLE);
     }
 
-    public  boolean isPublicField(Element e) {
+    public boolean isPublicField(Element e) {
         return e.getKind().isField()
                 && e.getModifiers().contains(Modifier.PUBLIC);
     }

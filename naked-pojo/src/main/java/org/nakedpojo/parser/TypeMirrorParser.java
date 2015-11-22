@@ -1,9 +1,9 @@
 package org.nakedpojo.parser;
 
 import org.nakedpojo.Messages;
+import org.nakedpojo.NakedParseException;
 import org.nakedpojo.interfaces.Parser;
 import org.nakedpojo.model.javascript.JSType;
-import org.nakedpojo.NakedParseException;
 import org.nakedpojo.model.javascript.Type;
 import org.nakedpojo.utils.TypeMirrorUtils;
 
@@ -13,8 +13,9 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.Diagnostic;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class TypeMirrorParser implements Parser<Element, JSType>
 {
@@ -52,12 +53,9 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     public void scan(Element element) {
         assertNotNull(element);
-        if(!prototypes.containsKey(element))
-            prototypes.put(element, new JSType(utils.fieldName(element)));
-        else
-            return;
+        if(prototypes.containsKey(element)) return;
 
-        JSType prototype = prototypes.get(element);
+        JSType prototype = fetchPrototypeFor(element);
 
         if(utils.isPrimitive(element)) {
             prototypes.put(element, convertPrimitive(element));
@@ -79,19 +77,19 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             prototype = prototype.withType(Type.OBJECT);
             prototypes.put(element, prototype);
 
-            processGetters(element, prototype);
-            processSetters(element, prototype);
-            processPublicFields(element, prototype);
-            processNestedClasses(element, prototype);
+            processGetters(element);
+            processSetters(element);
+            processPublicFields(element);
+            processNestedClasses(element);
 
             // Scan all supertype elements and add them to this class' prototype
             for(Element superTypeElement : utils.supertypeElements(element)) {
                 scan(superTypeElement);
 
-                processGetters(superTypeElement, prototype);
-                processSetters(superTypeElement, prototype);
-                processPublicFields(superTypeElement, prototype);
-                processNestedClasses(superTypeElement, prototype);
+                processGetters(superTypeElement);
+                processSetters(superTypeElement);
+                processPublicFields(superTypeElement);
+                processNestedClasses(superTypeElement);
             }
 
             prototypes.put(element, prototype);
@@ -99,7 +97,8 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         // Any other type of class?
     }
 
-    private void processGetters(Element element, JSType prototype) {
+    private void processGetters(Element element) {
+        JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for(ExecutableElement getter: utils.getters(element)) {
             Element returnTypeClass = types.asElement(getter.getReturnType());
@@ -107,7 +106,8 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         }
     }
 
-    private void processSetters(Element element, JSType prototype) {
+    private void processSetters(Element element) {
+        JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for(ExecutableElement setter : utils.setters(element)) {
             Element returnTypeClass = types.asElement(setter.getReturnType());
@@ -115,14 +115,16 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         }
     }
 
-    private void processPublicFields(Element element, JSType prototype) {
+    private void processPublicFields(Element element) {
+        JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for (Element field : utils.publicFields(element)) {
             members.add(convert(field, utils.simpleName(field)));
         }
     }
 
-    private void processNestedClasses(Element element, JSType prototype) {
+    private void processNestedClasses(Element element) {
+        JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for (Element nestedClass : utils.nestedClasses(element)) {
             scan(nestedClass);
@@ -155,5 +157,11 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     private static void assertNotNull(Element obj) {
         if(obj == null) throw new NakedParseException(Messages.elementIsNull());
+    }
+
+    private JSType fetchPrototypeFor(Element element) {
+        if(!prototypes.containsKey(element))
+            prototypes.put(element, new JSType(utils.fieldName(element)));
+        return prototypes.get(element);
     }
 }

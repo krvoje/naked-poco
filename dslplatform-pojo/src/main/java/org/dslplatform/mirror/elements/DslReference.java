@@ -24,12 +24,16 @@ public class DslReference extends DslField {
     }
 
     @Override
-    public <T extends DslField> T withType(DslPrimitive type) {
-        return null;
+    public DslReference withType(DslPrimitive type) {
+        return new DslReference(name, type, referenced);
     }
 
     @Override
-    public <T extends DslPlatformElement> T withName(String name) {
-        return null;
+    public DslReference withName(String name) {
+        return new DslReference(name, type, referenced);
+    }
+
+    public DslReference withReferenced(ModuleElement referenced) {
+        return new DslReference(name, type, referenced);
     }
 }
