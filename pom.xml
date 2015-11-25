@@ -13,7 +13,7 @@
         <module>naked-pojo</module>
         <module>naked-pojo-tests</module>
         <module>naked-pojo-utils</module>
-        <module>dslplatform-pojo</module>
+        <!--<module>dslplatform-pojo</module>-->
     </modules>
 
     <dependencyManagement>
@@ -33,11 +33,12 @@
                 <artifactId>naked-pojo-tests</artifactId>
                 <version>${naked-pojo.version}</version>
             </dependency>
+            <!--
             <dependency>
                 <groupId>org.krvoje</groupId>
                 <artifactId>dsl-platform-pojo</artifactId>
                 <version>${naked-pojo.version}</version>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>ST4</artifactId>
