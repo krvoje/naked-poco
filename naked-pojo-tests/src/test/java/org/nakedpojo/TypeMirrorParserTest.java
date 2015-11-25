@@ -24,10 +24,10 @@ public class TypeMirrorParserTest {
         ClassLoader cl = TypeMirrorParserTest.class.getClassLoader();
 
         assertEquals(fileText("Book_knockout_expected.js"),
-                fileText("generated-test-sources/test-annotations/Book.js"));
+                fileText("target/generated-test-sources/test-annotations/Book.js"));
         assertEquals(fileText("Author_knockout_expected.js"),
-                fileText("generated-test-sources/test-annotations/Author.js"));
+                fileText("target/generated-test-sources/test-annotations/Author.js"));
         assertEquals(fileText("Genre_knockout_expected.js"),
-                fileText("generated-test-sources/test-annotations/Genre.js"));
+                fileText("target/generated-test-sources/test-annotations/Genre.js"));
     }
 }

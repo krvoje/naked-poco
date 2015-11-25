@@ -2,6 +2,7 @@ package org.nakedpojo;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 class TestUtils {
@@ -10,6 +11,8 @@ class TestUtils {
         file = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
         if(file == null)
             file = TestUtils.class.getResourceAsStream(filename);
+        if(file == null)
+            file = new FileInputStream(filename);
         if(file == null)
             System.out.println("Error loading " + filename);
 

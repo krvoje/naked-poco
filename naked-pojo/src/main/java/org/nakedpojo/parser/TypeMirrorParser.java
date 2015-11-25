@@ -124,8 +124,6 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     }
 
     private void processNestedClasses(Element element) {
-        JSType prototype = fetchPrototypeFor(element);
-        Set<JSType> members = prototype.getMembers();
         for (Element nestedClass : utils.nestedClasses(element)) {
             scan(nestedClass);
         }

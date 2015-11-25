@@ -97,13 +97,13 @@ public class TypeMirrorUtils {
     }
 
     public String typeName(Element element) {
-        return element.asType().getKind().equals(TypeKind.EXECUTABLE) ?
+        return element instanceof ExecutableElement ?
                 ((ExecutableElement)element).getReturnType().toString()
                 : element.toString();
     }
 
     public String simpleName(Element element) {
-        if(element.asType().getKind().equals(TypeKind.EXECUTABLE)) {
+        if(element instanceof ExecutableElement) {
             return ((ExecutableElement)element).getSimpleName().toString();
         } else {
             return element.getSimpleName().toString();
