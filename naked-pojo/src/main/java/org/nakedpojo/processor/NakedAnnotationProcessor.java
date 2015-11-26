@@ -16,8 +16,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
-//@SupportedAnnotationTypes(Naked.NAME)
-@SupportedAnnotationTypes("*")
+@SupportedAnnotationTypes(Naked.NAME)
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
     private NakedPojo nakedPojo;
@@ -58,10 +57,14 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
         for(Element element: elements) {
             nakedPojo.scan(element);
         }
-
         if(properties.generationStrategy.equals(Config.GenerationStrategy.MULTIPLE_FILES)) {
             for(Element element: elements) {
                 Naked naked = element.getAnnotation(Naked.class);
+                if(naked.templateFilename().isEmpty()) {
+                    nakedPojo.setTemplateType(naked.templateType());
+                } else {
+                    nakedPojo.setTemplateFilename(naked.templateFilename());
+                }
                 String targetTypeName = naked.targetTypeName().isEmpty() ?
                         element.getSimpleName().toString() :
                         naked.targetTypeName();

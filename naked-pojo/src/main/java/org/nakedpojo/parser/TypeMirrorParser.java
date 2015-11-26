@@ -47,7 +47,6 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     public JSType convert(Element element, String fieldName) {
         assertNotNull(element);
         scan(element);
-
         return prototypes.get(element).withName(fieldName);
     }
 
@@ -55,25 +54,22 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         assertNotNull(element);
 
         JSType prototype = fetchPrototypeFor(element);
-        if(!prototype.getType().isUndefined()) return;
 
         if(utils.isPrimitive(element)) {
             prototypes.put(element, convertPrimitive(element));
-        }
-        else if(utils.isEnum(element)) {
+        } else if(utils.isEnum(element)) {
             for(Element enumMeber : element.getEnclosedElements()) {
                 if(enumMeber.getKind().equals(ElementKind.ENUM_CONSTANT))
                     prototype.getMembers().add(new JSType(utils.fieldName(enumMeber), Type.ENUM_MEMBER));
             }
 
+
             prototypes.put(element,
                     prototype
-                            .withType(Type.ENUM));
-        }
-        else if(utils.isIterable(element)) {
+                        .withType(Type.ENUM));
+        } else if(utils.isIterable(element)) {
             prototypes.put(element, prototype.withType(Type.ARRAY));
-        }
-        else if(utils.isClass(element)) {
+        } else { // Otherwise this is an object
             prototype = prototype.withType(Type.OBJECT);
             prototypes.put(element, prototype);
 

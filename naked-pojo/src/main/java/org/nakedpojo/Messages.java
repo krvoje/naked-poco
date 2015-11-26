@@ -6,8 +6,8 @@ public class Messages {
 
     public static String unexpectedElementKind(Element element) {
         return String.format(
-                "Unexpected element kind. Should be a class, actually is a %s",
-                element.getKind().toString());
+                "Unexpected element kind. The element: '%s' should not be a %s",
+                element, element.getKind().toString());
     }
 
     public static String elementIsNull() {

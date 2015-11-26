@@ -10,5 +10,10 @@ public @interface Naked {
     /**
      * The fieldName of the target type in the generated code
      */
+    // TODO: implement this
     String targetTypeName() default "";
+
+    String templateFilename() default "";
+
+    TemplateType templateType() default TemplateType.DEFAULT;
 }

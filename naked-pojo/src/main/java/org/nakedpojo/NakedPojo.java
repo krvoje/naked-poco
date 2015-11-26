@@ -1,5 +1,6 @@
 package org.nakedpojo;
 
+import org.nakedpojo.annotations.TemplateType;
 import org.nakedpojo.interfaces.Parser;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
@@ -10,23 +11,6 @@ import java.util.Set;
 
 public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
 
-    public enum TemplateType {
-        DEFAULT("KnockoutObservableTemplates.stg"),
-        KNOCKOUT_JS("KnockoutObservableTemplates.stg"),
-        PLAIN_JAVASCRIPT("PlainJavaScriptTemplates.stg"),
-        CUSTOM("");
-
-        private String templateFilename;
-        private TemplateType(String templateFilename) {
-            this.templateFilename = templateFilename;
-        }
-
-        TemplateType withFilename(String templateFilename) {
-            this.templateFilename = templateFilename;
-            return this;
-        }
-    }
-
     private static final String JS_TEMPLATE = "JavaScriptObject";
     private static final String JS_INSTANCE_TEMPLATE = "jsObj";
 
@@ -34,13 +18,14 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
     private final Set<SOURCE_TYPE> targets = new HashSet<SOURCE_TYPE>();
 
     private final Parser<SOURCE_TYPE, METADATA_TYPE> parser;
-    private final TemplateType templateType;
-    private final STGroupFile stGroupFile;
+    private TemplateType templateType;
+    private String templateFilename;
+    private STGroupFile stGroupFile;
 
     public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, TemplateType templateType, SOURCE_TYPE... targets) {
         this.parser = parser;
         this.templateType = templateType;
-        this.stGroupFile = new STGroupFile(this.templateType.templateFilename);
+        this.stGroupFile = new STGroupFile(this.templateType.getTemplateFilename());
 
         if(targets != null)
         for(SOURCE_TYPE target : targets)
@@ -92,5 +77,15 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
             names[i] = packages[i].getName();
         }
         return names;
+    }
+
+    public void setTemplateType(TemplateType templateType) {
+        this.setTemplateType(templateType);
+        this.setTemplateFilename(templateType.getTemplateFilename());
+    }
+
+    public void setTemplateFilename(String templateFilename) {
+        this.templateFilename = templateFilename;
+        this.stGroupFile = new STGroupFile(templateFilename);
     }
 }

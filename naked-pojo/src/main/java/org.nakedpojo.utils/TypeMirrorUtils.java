@@ -21,6 +21,8 @@ public class TypeMirrorUtils {
     // Quazi-constants, since this cannot be a static util class
     private final TypeMirror STRING_TYPE;
     private final TypeMirror OBJECT_TYPE;
+    private final TypeMirror CLASS_TYPE;
+    private final TypeMirror ENUM_TYPE;
 
     public final Comparator<Element> TYPE_NAME_COMPARATOR = new Comparator<Element>() {
         @Override
@@ -36,6 +38,8 @@ public class TypeMirrorUtils {
 
         this.STRING_TYPE = elements.getTypeElement(java.lang.String.class.getCanonicalName()).asType();
         this.OBJECT_TYPE = elements.getTypeElement(java.lang.Object.class.getCanonicalName()).asType();
+        this.CLASS_TYPE = elements.getTypeElement(java.lang.Class.class.getCanonicalName()).asType();
+        this.ENUM_TYPE = elements.getTypeElement(java.lang.Enum.class.getCanonicalName()).asType();
     }
 
     public boolean isNumeric(Element element) {
@@ -70,9 +74,13 @@ public class TypeMirrorUtils {
         return element.asType().getKind().equals(TypeKind.BYTE);
     }
 
-    public boolean isEnum(Element element)
-    {
-        return element.getKind().equals(ElementKind.ENUM);
+    public boolean isEnum(Element element) {
+        if(element.getKind().equals(ElementKind.ENUM)) return true;
+        for(Element st : supertypeElements(element)) {
+            if(st == null || st.asType() == null) continue;
+            if(types.isSameType(st.asType(), ENUM_TYPE)) return true;
+        }
+        return false;
     }
 
     public boolean isIterable(Element element) {
@@ -107,7 +115,9 @@ public class TypeMirrorUtils {
             // Upon encountering Object, stop (this will ignore interfaces)
             if(types.isSameType(tm, OBJECT_TYPE))
                 break;
-            supertypeElements.add(types.asElement(tm));
+            Element te = types.asElement(tm);
+            if(te != null && !te.getKind().equals(ElementKind.INTERFACE))
+                supertypeElements.add(te);
         }
         return supertypeElements;
     }

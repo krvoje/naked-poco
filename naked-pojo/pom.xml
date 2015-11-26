@@ -16,10 +16,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.krvoje</groupId>
-            <artifactId>naked-pojo-utils</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>ST4</artifactId>
         </dependency>
