@@ -41,21 +41,21 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     public JSType convert(Element element) {
         assertNotNull(element);
-        String fieldName = utils.fieldName(element);
-        return convert(element, fieldName);
+        return convert(element, utils.fieldName(element));
     }
 
     public JSType convert(Element element, String fieldName) {
         assertNotNull(element);
         scan(element);
+
         return prototypes.get(element).withName(fieldName);
     }
 
     public void scan(Element element) {
         assertNotNull(element);
-        if(prototypes.containsKey(element)) return;
 
         JSType prototype = fetchPrototypeFor(element);
+        if(!prototype.getType().isUndefined()) return;
 
         if(utils.isPrimitive(element)) {
             prototypes.put(element, convertPrimitive(element));
@@ -63,7 +63,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         else if(utils.isEnum(element)) {
             for(Element enumMeber : element.getEnclosedElements()) {
                 if(enumMeber.getKind().equals(ElementKind.ENUM_CONSTANT))
-                    prototype.getMembers().add(new JSType(utils.typeName(enumMeber), Type.ENUM_MEMBER));
+                    prototype.getMembers().add(new JSType(utils.fieldName(enumMeber), Type.ENUM_MEMBER));
             }
 
             prototypes.put(element,
@@ -84,17 +84,12 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
             // Scan all supertype elements and add them to this class' prototype
             for(Element superTypeElement : utils.supertypeElements(element)) {
-                scan(superTypeElement);
-
-                processGetters(superTypeElement);
-                processSetters(superTypeElement);
-                processPublicFields(superTypeElement);
-                processNestedClasses(superTypeElement);
+                JSType superType = convert(superTypeElement);
+                prototype.getMembers().addAll(superType.getMembers());
             }
 
             prototypes.put(element, prototype);
         }
-        // Any other type of class?
     }
 
     private void processGetters(Element element) {
@@ -119,7 +114,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for (Element field : utils.publicFields(element)) {
-            members.add(convert(field, utils.simpleName(field)));
+            members.add(convert(field, utils.fieldName(field)));
         }
     }
 
@@ -130,22 +125,22 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     }
 
     private JSType convertPrimitive(Element element) {
-        String simpleName = utils.simpleName(element);
+        String fieldName = utils.fieldName(element);
         if(utils.isBoolean(element)) {
-            return new JSType(simpleName, Type.BOOLEAN);
+            return new JSType(fieldName, Type.BOOLEAN);
         }
         else if(utils.isString(element)) {
-            return new JSType(simpleName, Type.STRING);
+            return new JSType(fieldName, Type.STRING);
         }
         else if(utils.isByte(element)) {
             // TODO: implement
-            return new JSType(simpleName, Type.UNDEFINED);
+            return new JSType(fieldName, Type.UNDEFINED);
         }
         else if(utils.isNumeric(element)) {
-            return new JSType(simpleName, Type.NUMBER);
+            return new JSType(fieldName, Type.NUMBER);
         }
         else {
-            return new JSType(simpleName, Type.UNDEFINED);
+            return new JSType(fieldName, Type.UNDEFINED);
         }
     }
 

@@ -15,19 +15,26 @@ import static org.nakedpojo.TestUtils.fileText;
 public class TypeMirrorParserTest {
 
     @Test
-    public void knockoutPerClass() throws Exception {
-
-        // Just a dummy invocation to get the needed stuff to classpath
-
-        // Classes should be in generated-sources at this point
-
-        ClassLoader cl = TypeMirrorParserTest.class.getClassLoader();
-
+    public void knockoutBook() throws Exception {
         assertEquals(fileText("Book_knockout_expected.js"),
                 fileText("target/generated-test-sources/test-annotations/Book.js"));
+    }
+
+    @Test
+    public void knockoutAuthor() throws Exception {
         assertEquals(fileText("Author_knockout_expected.js"),
                 fileText("target/generated-test-sources/test-annotations/Author.js"));
+    }
+
+    @Test
+    public void knockoutGenre() throws Exception {
         assertEquals(fileText("Genre_knockout_expected.js"),
                 fileText("target/generated-test-sources/test-annotations/Genre.js"));
+    }
+
+    @Test
+    public void knockoutSciFiAuthor() throws Exception {
+        assertEquals(fileText("SciFiAuthor_knockout_expected.js"),
+                fileText("target/generated-test-sources/test-annotations/SciFiAuthor.js"));
     }
 }

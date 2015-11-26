@@ -58,7 +58,6 @@ public class TypeMirrorUtils {
     }
 
     public boolean isString(Element element) {
-        System.out.println(element.asType().getKind() + ", " + STRING_TYPE);
         return element.asType().getKind().equals(TypeKind.CHAR)
                 || types.isSameType(element.asType(), STRING_TYPE);
     }
@@ -99,15 +98,7 @@ public class TypeMirrorUtils {
     public String typeName(Element element) {
         return element instanceof ExecutableElement ?
                 ((ExecutableElement)element).getReturnType().toString()
-                : element.toString();
-    }
-
-    public String simpleName(Element element) {
-        if(element instanceof ExecutableElement) {
-            return ((ExecutableElement)element).getSimpleName().toString();
-        } else {
-            return element.getSimpleName().toString();
-        }
+                : element.asType().toString();
     }
 
     public List<Element> supertypeElements(Element element) {
