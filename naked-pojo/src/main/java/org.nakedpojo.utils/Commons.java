@@ -73,4 +73,9 @@ public class Commons {
         return name.startsWith(SET_PREFIX)
                 && !name.equals(SET_PREFIX);
     }
+
+    public static <T> T last(T[] ts) {
+        if(nullOrEmpty(ts)) return null;
+        else return ts[ts.length-1];
+    }
 }
