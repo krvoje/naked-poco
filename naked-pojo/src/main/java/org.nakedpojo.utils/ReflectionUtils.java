@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.nakedpojo.utils.Commons.equalsEither;
+
 public class ReflectionUtils {
 
     private static final String GET = "get";
@@ -88,13 +90,14 @@ public class ReflectionUtils {
     public static boolean isGetter(Method method) {
         String name = method.getName();
         return Commons.isGetterName(name)
-                && !method.getReturnType().equals(Void.class);
+                && !equalsEither(method.getReturnType(), Void.class, void.class);
     }
 
     public static boolean isSetter(Method method) {
         String name = method.getName();
         return Commons.isSetterName(name)
-                && method.getReturnType().equals(Void.class);
+                && equalsEither(method.getReturnType(), Void.class, void.class)
+                && method.getParameterTypes().length == 1;
     }
 
     public static boolean isSubclassOf(Class clazz, Class superClazz) {

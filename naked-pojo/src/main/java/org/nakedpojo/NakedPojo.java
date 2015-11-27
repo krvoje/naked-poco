@@ -80,7 +80,7 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
     }
 
     public void setTemplateType(TemplateType templateType) {
-        this.setTemplateType(templateType);
+        this.templateType = templateType;
         this.setTemplateFilename(templateType.getTemplateFilename());
     }
 

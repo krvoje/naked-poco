@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.nakedpojo.utils.ReflectionUtils.*;
-import static org.nakedpojo.utils.Commons.*;
 
 public class ReflectionsParser implements Parser<Class, JSType>
 {
@@ -64,6 +63,11 @@ public class ReflectionsParser implements Parser<Class, JSType>
             for(Method getter: getters(clazz)) {
                 Class getterClazz = getter.getReturnType();
                 members.add(convert(getterClazz, fieldName(getter)));
+            }
+
+            for(Method setter: setters(clazz)) {
+                Class setterParamClazz = setter.getParameterTypes()[0];
+                members.add(convert(setterParamClazz, fieldName(setter)));
             }
 
             for(Field field : publicFields(clazz)) {

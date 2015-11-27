@@ -6,8 +6,8 @@ import java.util.List;
 
 @Naked
 public class Author implements HumanInterface {
-    public final String name;
-    public final String surname;
+    private final String name;
+    private String surname;
     public final Book book;
     public final List<Book> books;
     public final boolean prolific;
@@ -20,9 +20,16 @@ public class Author implements HumanInterface {
         this.prolific = prolific;
     }
 
-
     @Override
     public String getIdNumber() {
         return "123123";
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 }

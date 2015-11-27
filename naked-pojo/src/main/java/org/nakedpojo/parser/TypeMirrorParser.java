@@ -101,7 +101,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for(ExecutableElement setter : utils.setters(element)) {
-            Element returnTypeClass = types.asElement(setter.getReturnType());
+            Element returnTypeClass = setter.getParameters().get(0);
             members.add(convert(returnTypeClass, utils.fieldNameFromAccessor(setter)));
         }
     }

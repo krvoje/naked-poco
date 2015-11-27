@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.nakedpojo.annotations.TemplateType;
 import org.nakedpojo.model.Author;
 import org.nakedpojo.model.Book;
 import org.nakedpojo.parser.ReflectionsParser;
@@ -20,7 +21,7 @@ public class ReflectionsParserTest {
     @Test
     public void knockoutPerClass() throws Exception {
         NakedPojo np = new NakedPojo(new ReflectionsParser(),
-                NakedPojo.TemplateType.KNOCKOUT_JS,
+                TemplateType.KNOCKOUT_JS,
                 Book.class, Author.class, Book.Genre.class);
 
         String bookJS = np.render(Book.class);
@@ -35,7 +36,7 @@ public class ReflectionsParserTest {
     @Test
     public void javascriptPerClass() throws Exception {
         NakedPojo np = new NakedPojo(new ReflectionsParser(),
-                NakedPojo.TemplateType.PLAIN_JAVASCRIPT,
+                TemplateType.PLAIN_JAVASCRIPT,
                 Book.class, Author.class, Book.Genre.class);
 
         String bookJS = np.render(Book.class);

@@ -4,6 +4,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class TypeMirrorUtils {
     }
 
     public boolean isSetter(Element element) {
-        return Commons.isGetterName(fieldName(element))
+        return Commons.isSetterName(fieldName(element))
                 && element.asType().getKind().equals(TypeKind.EXECUTABLE)
                 && element.getModifiers().contains(Modifier.PUBLIC)
                 && ((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)
@@ -160,7 +161,7 @@ public class TypeMirrorUtils {
 
     public List<ExecutableElement> getters(Element element) {
         List<ExecutableElement> getters = new ArrayList<>();
-        for(Element enclosed: element.getEnclosedElements()) {
+        for(Element enclosed: ElementFilter.methodsIn(element.getEnclosedElements())) {
             if(isGetter(enclosed)) getters.add((ExecutableElement)enclosed);
         }
         return getters;
@@ -168,7 +169,7 @@ public class TypeMirrorUtils {
 
     public List<ExecutableElement> setters(Element element) {
         List<ExecutableElement> setters = new ArrayList<>();
-        for(Element enclosed: element.getEnclosedElements()) {
+        for(Element enclosed: ElementFilter.methodsIn(element.getEnclosedElements())) {
             if(isSetter(enclosed)) setters.add((ExecutableElement)enclosed);
         }
         return setters;
