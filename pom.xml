@@ -74,7 +74,6 @@
                         <verbose>true</verbose>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
-                        <proc>none</proc>
                     </configuration>
                 </plugin>
                 <plugin>

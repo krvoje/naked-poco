@@ -82,7 +82,6 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
 
     private void writeToFile(String filename, String content) {
         try {
-            System.out.println("Writing to file: " + filename);
             FileObject fl = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", filename);
             Writer writer = fl.openWriter();
             writer.write(content);
