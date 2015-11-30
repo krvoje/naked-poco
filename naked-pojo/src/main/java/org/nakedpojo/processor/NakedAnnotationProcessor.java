@@ -16,13 +16,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
+import static org.nakedpojo.utils.Commons.nullOrEmpty;
+
 @SupportedAnnotationTypes(Naked.NAME)
 public class NakedAnnotationProcessor extends AbstractProcessor {
 
-    private NakedPojo nakedPojo;
-
-    private Types types;
-    private Elements elements;
+    private Types typeUtils;
+    private Elements elementUtils;
     private Messager messager;
     private Filer filer;
 
@@ -30,13 +30,11 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
 
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        this.elements = processingEnv.getElementUtils();
-        this.types = processingEnv.getTypeUtils();
+        this.elementUtils = processingEnv.getElementUtils();
+        this.typeUtils = processingEnv.getTypeUtils();
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
         this.properties = new Config();
-
-        this.nakedPojo = new NakedPojo(new TypeMirrorParser(types, elements, messager));
     }
 
     @Override
@@ -54,21 +52,21 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
     }
 
     private void processNaked(Set<? extends Element> elements) {
+        NakedPojo nakedPojo = new NakedPojo(new TypeMirrorParser(typeUtils, elementUtils, messager));
         for(Element element: elements) {
             nakedPojo.scan(element);
         }
         if(properties.generationStrategy.equals(Config.GenerationStrategy.MULTIPLE_FILES)) {
             for(Element element: elements) {
                 Naked naked = element.getAnnotation(Naked.class);
-                if(naked.templateFilename().isEmpty()) {
-                    nakedPojo.setTemplateType(naked.templateType());
-                } else {
-                    nakedPojo.setTemplateFilename(naked.templateFilename());
-                }
+                String templateFilename = !nullOrEmpty(naked.templateFilename()) ?
+                        naked.templateFilename()
+                        : naked.templateType().templateFilename;
+
                 String targetTypeName = naked.targetTypeName().isEmpty() ?
                         element.getSimpleName().toString() :
                         naked.targetTypeName();
-                String content = nakedPojo.render(element);
+                String content = nakedPojo.render(element, templateFilename);
                 writeToFile(targetTypeName + ".js", content);
             }
         }

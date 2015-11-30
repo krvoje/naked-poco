@@ -18,28 +18,11 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
     private final Set<SOURCE_TYPE> targets = new HashSet<SOURCE_TYPE>();
 
     private final Parser<SOURCE_TYPE, METADATA_TYPE> parser;
-    private TemplateType templateType;
-    private String templateFilename;
-    private STGroupFile stGroupFile;
 
-    public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, TemplateType templateType, SOURCE_TYPE... targets) {
-        this.parser = parser;
-        this.templateType = templateType;
-        this.stGroupFile = new STGroupFile(this.templateType.getTemplateFilename());
-
-        if(targets != null)
-        for(SOURCE_TYPE target : targets)
-            this.targets.add(target);
-    }
+    // TODO: A constructor taking a @Naked annotation
 
     public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, SOURCE_TYPE... targets) {
-        this(parser, TemplateType.DEFAULT, targets);
-    }
-
-    public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, String customTemplateFilename, SOURCE_TYPE... targets) {
         this.parser = parser;
-        this.templateType = TemplateType.CUSTOM.withFilename(customTemplateFilename);
-        this.stGroupFile = new STGroupFile(customTemplateFilename);
 
         if(targets != null)
             for(SOURCE_TYPE target : targets)
@@ -56,8 +39,14 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
         this.parser.scan(clazz);
     }
 
-    public String render(SOURCE_TYPE clazz) {
+    public String renderDefault(SOURCE_TYPE clazz) {
+        return render(clazz, TemplateType.DEFAULT.templateFilename);
+    }
+
+    public String render(SOURCE_TYPE clazz, String templateFilename) {
         if(!targets.contains(clazz)) targets.add(clazz);
+        System.out.println(templateFilename);
+        STGroupFile stGroupFile = new STGroupFile(templateFilename);
         ST template = stGroupFile.getInstanceOf(JS_TEMPLATE);
         template.add(JS_INSTANCE_TEMPLATE, parser.convert(clazz));
         return template.render();
@@ -66,26 +55,9 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
     public String renderAll() {
         StringBuilder sb = new StringBuilder();
         for(SOURCE_TYPE clazz: targets) {
-            sb.append(this.render(clazz));
+            // TODO: this is wrong
+            sb.append(this.renderDefault(clazz));
         }
         return sb.toString();
-    }
-
-    private static String[] packageNames(Package ... packages) {
-        String[] names = new String[packages.length];
-        for(int i=0; i<packages.length; i++) {
-            names[i] = packages[i].getName();
-        }
-        return names;
-    }
-
-    public void setTemplateType(TemplateType templateType) {
-        this.templateType = templateType;
-        this.setTemplateFilename(templateType.getTemplateFilename());
-    }
-
-    public void setTemplateFilename(String templateFilename) {
-        this.templateFilename = templateFilename;
-        this.stGroupFile = new STGroupFile(templateFilename);
     }
 }
