@@ -14,7 +14,7 @@ public class Book {
     public final Genre genre;
     public final Author author;
     public final Author[] authors;
-    public final int pages;
+    public final Integer pages;
     public final char pg;
     public final long borrowedCount;
 

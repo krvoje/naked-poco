@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.nakedpojo.utils.Commons.fieldNameFromGetterOrSetter;
+import static org.nakedpojo.utils.Commons.nullOrEmpty;
 
 public class TypeMirrorUtils {
 
@@ -25,6 +26,18 @@ public class TypeMirrorUtils {
     private final TypeMirror CLASS_TYPE;
     private final TypeMirror ENUM_TYPE;
 
+    private final TypeMirror SHORT_TYPE;
+    private final TypeMirror INT_TYPE;
+    private final TypeMirror LONG_TYPE;
+    private final TypeMirror FLOAT_TYPE;
+    private final TypeMirror DOUBLE_TYPE;
+
+    private final TypeMirror SHORT_PRIMITIVE_TYPE;
+    private final TypeMirror INT_PRIMITIVE_TYPE;
+    private final TypeMirror LONG_PRIMITIVE_TYPE;
+    private final TypeMirror FLOAT_PRIMITIVE_TYPE;
+    private final TypeMirror DOUBLE_PRIMITIVE_TYPE;
+
     public final Comparator<Element> TYPE_NAME_COMPARATOR = new Comparator<Element>() {
         @Override
         public int compare(Element o1, Element o2) {
@@ -37,19 +50,37 @@ public class TypeMirrorUtils {
         this.elements = elements;
         this.messager = messager;
 
-        this.STRING_TYPE = elements.getTypeElement(java.lang.String.class.getCanonicalName()).asType();
-        this.OBJECT_TYPE = elements.getTypeElement(java.lang.Object.class.getCanonicalName()).asType();
-        this.CLASS_TYPE = elements.getTypeElement(java.lang.Class.class.getCanonicalName()).asType();
-        this.ENUM_TYPE = elements.getTypeElement(java.lang.Enum.class.getCanonicalName()).asType();
+        this.STRING_TYPE = typeForClass(java.lang.String.class);
+        this.OBJECT_TYPE = typeForClass(java.lang.Object.class);
+        this.CLASS_TYPE = typeForClass(java.lang.Class.class);
+        this.ENUM_TYPE = typeForClass(java.lang.Enum.class);
+
+        this.SHORT_TYPE = typeForClass(java.lang.Short.class);
+        this.INT_TYPE = typeForClass(java.lang.Integer.class);
+        this.LONG_TYPE = typeForClass(java.lang.Long.class);
+        this.FLOAT_TYPE = typeForClass(java.lang.Float.class);
+        this.DOUBLE_TYPE = typeForClass(java.lang.Double.class);
+
+        this.SHORT_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.SHORT);
+        this.INT_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.INT);
+        this.LONG_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.LONG);
+        this.FLOAT_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.FLOAT);
+        this.DOUBLE_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.DOUBLE);
     }
 
     public boolean isNumeric(Element element) {
-        return Commons.equalsEither(element.asType().getKind(),
-                TypeKind.SHORT,
-                TypeKind.INT,
-                TypeKind.LONG,
-                TypeKind.FLOAT,
-                TypeKind.DOUBLE);
+        return sameTypeAsEither(element.asType(),
+                SHORT_PRIMITIVE_TYPE,
+                INT_PRIMITIVE_TYPE,
+                LONG_PRIMITIVE_TYPE,
+                FLOAT_PRIMITIVE_TYPE,
+                DOUBLE_PRIMITIVE_TYPE,
+                SHORT_TYPE,
+                INT_TYPE,
+                LONG_TYPE,
+                FLOAT_TYPE,
+                DOUBLE_TYPE)
+                ;
     }
 
     public boolean isPublicField(Element e) {
@@ -59,6 +90,7 @@ public class TypeMirrorUtils {
 
     public boolean isPrimitive(Element element) {
         return element.asType().getKind().isPrimitive()
+                || isNumeric(element)
                 || types.isSameType(element.asType(), STRING_TYPE);
     }
 
@@ -173,5 +205,20 @@ public class TypeMirrorUtils {
             if(isSetter(enclosed)) setters.add((ExecutableElement)enclosed);
         }
         return setters;
+    }
+
+    public boolean sameTypeAsEither(TypeMirror tm, TypeMirror ... tms) {
+        if(!nullOrEmpty(tms)) {
+            for (TypeMirror tm_ : tms) {
+                if(types.isSameType(tm, tm_))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private TypeMirror typeForClass(Class clazz) {
+        // FIXME: Returns null for primitive types
+        return elements.getTypeElement(clazz.getCanonicalName()).asType();
     }
 }

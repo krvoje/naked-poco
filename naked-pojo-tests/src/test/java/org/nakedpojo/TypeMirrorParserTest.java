@@ -12,6 +12,12 @@ import static org.nakedpojo.TestUtils.fileText;
 public class TypeMirrorParserTest {
 
     @Test
+    public void knockoutPrimitiveFieldsOnly() throws Exception {
+        assertEquals(fileText("PrimitiveFieldsOnly_knockout_expected.js"),
+                fileText("target/generated-test-sources/test-annotations/PrimitiveFieldsOnly.js"));
+    }
+
+    @Test
     public void knockoutBook() throws Exception {
         assertEquals(fileText("Book_knockout_expected.js"),
                 fileText("target/generated-test-sources/test-annotations/Book.js"));
