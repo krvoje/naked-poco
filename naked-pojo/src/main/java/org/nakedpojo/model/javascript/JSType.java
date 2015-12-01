@@ -15,51 +15,35 @@ public class JSType {
         }
     });
 
-    public JSType(String typeName, String fieldName, Type type, Collection<JSType> members) {
+    public JSType(String typeName, String fieldName, Type type, JSType ... members) {
         this.typeName = typeName;
         this.fieldName = fieldName;
         this.type = type;
-        this.members.addAll(members);
+        this.members.addAll(asList(members));
     }
 
-    public JSType(String typeName, String fieldName, Type type, JSType ... members) {
-        this(typeName, fieldName, type, asList(members));
+    public JSType(String typeName, String fieldName, Type type, Collection<JSType> members) {
+        this(typeName, fieldName, type, members.toArray(new JSType[members.size()]));
     }
 
-    public JSType(String typeName) {
-        this(typeName, typeName, Type.UNDEFINED);
+    public JSType withTypeName(String typeName) {
+        return new JSType(typeName, fieldName, type, members);
     }
 
-    public JSType(String typeName, String fieldName) {
-        this(typeName, fieldName, Type.UNDEFINED);
-    }
-
-    public JSType(String typeName, Type type) {
-        this(typeName, typeName, type);
-    }
-
-    public JSType(String fieldName, Type type, JSType ... members) {
-        this(fieldName, fieldName, type, members);
-    }
-
-    public JSType(String fieldName, Type type, Collection<JSType> members) {
-        this(fieldName, fieldName, type, members);
-    }
-
-    public JSType withName(String fieldName) {
-        return new JSType(fieldName, type, members);
+    public JSType withFieldName(String fieldName) {
+        return new JSType(typeName, fieldName, type, members);
     }
 
     public JSType withType(Type type) {
-        return new JSType(fieldName, type, members);
+        return new JSType(typeName, fieldName, type, members);
     }
 
     public JSType withMembers(JSType[] members) {
-        return new JSType(fieldName, type, members);
+        return new JSType(typeName, fieldName, type, asList(members));
     }
 
     public JSType withMembers(Collection<JSType> members) {
-        return new JSType(fieldName, type, members.toArray(new JSType[members.size()]));
+        return new JSType(typeName, fieldName, type, members);
     }
 
     public String getTypeName() {

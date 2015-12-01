@@ -2,6 +2,7 @@ package org.nakedpojo;
 
 import org.nakedpojo.annotations.TemplateType;
 import org.nakedpojo.interfaces.Parser;
+import org.nakedpojo.model.javascript.JSType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -9,7 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
+public class NakedPojo<SOURCE_TYPE> {
 
     private static final String JS_TEMPLATE = "JavaScriptObject";
     private static final String JS_INSTANCE_TEMPLATE = "jsObj";
@@ -17,18 +18,18 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
     // TODO: Use a custom comparator here as well.
     private final Set<SOURCE_TYPE> targets = new HashSet<SOURCE_TYPE>();
 
-    private final Parser<SOURCE_TYPE, METADATA_TYPE> parser;
+    private final Parser<SOURCE_TYPE, JSType> parser;
 
     // TODO: A constructor taking a @Naked annotation
 
-    public NakedPojo(Parser<SOURCE_TYPE, METADATA_TYPE> parser, SOURCE_TYPE... targets) {
+    public NakedPojo(Parser<SOURCE_TYPE, JSType> parser, SOURCE_TYPE... targets) {
         this.parser = parser;
 
         if(targets != null)
             for(SOURCE_TYPE target : targets)
                 scan(target);
 
-        for(Map.Entry<SOURCE_TYPE, METADATA_TYPE> e: parser.prototypes().entrySet()) {
+        for(Map.Entry<SOURCE_TYPE, JSType> e: parser.prototypes().entrySet()) {
             SOURCE_TYPE key = e.getKey();
             if(!this.targets.contains(key)) this.targets.add(key);
         }
@@ -59,5 +60,10 @@ public class NakedPojo<SOURCE_TYPE, METADATA_TYPE> {
             sb.append(this.renderDefault(clazz));
         }
         return sb.toString();
+    }
+
+    public void setTargetTypeName(SOURCE_TYPE tp, String name) {
+        JSType prototype = parser.prototypes().get(tp);
+        parser.prototypes().put(tp, prototype.withTypeName(name));
     }
 }

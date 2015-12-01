@@ -24,6 +24,12 @@ public class TypeMirrorParserTest {
     }
 
     @Test
+    public void knockoutAuthorCustomName() throws Exception {
+        assertEquals(fileText("AuthorCustomName_knockout_expected.js"),
+                fileText("target/generated-test-sources/test-annotations/AuthorCustomName.js"));
+    }
+
+    @Test
     public void knockoutAuthor() throws Exception {
         assertEquals(fileText("Author_knockout_expected.js"),
                 fileText("target/generated-test-sources/test-annotations/Author.js"));

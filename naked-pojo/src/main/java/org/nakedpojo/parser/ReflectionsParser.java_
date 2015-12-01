@@ -27,7 +27,7 @@ public class ReflectionsParser implements Parser<Class, JSType>
 
     public JSType convert(Class clazz, String fieldName) {
         scan(clazz);
-        return prototypes.get(clazz).withName(fieldName);
+        return prototypes.get(clazz).withFieldName(fieldName);
     }
 
     public void scan(Class clazz) {

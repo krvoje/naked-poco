@@ -66,6 +66,9 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
                 String targetTypeName = naked.targetTypeName().isEmpty() ?
                         element.getSimpleName().toString() :
                         naked.targetTypeName();
+
+                nakedPojo.setTargetTypeName(element, targetTypeName);
+
                 String content = nakedPojo.render(element, templateFilename);
                 writeToFile(targetTypeName + ".js", content);
             }

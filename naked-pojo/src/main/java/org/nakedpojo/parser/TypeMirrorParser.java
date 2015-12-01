@@ -47,7 +47,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     public JSType convert(Element element, String fieldName) {
         assertNotNull(element);
         scan(element);
-        return prototypes.get(element).withName(fieldName);
+        return prototypes.get(element).withFieldName(fieldName);
     }
 
     public void scan(Element element) {
@@ -59,8 +59,9 @@ public class TypeMirrorParser implements Parser<Element, JSType>
             prototypes.put(element, convertPrimitive(element));
         } else if(utils.isEnum(element)) {
             for(Element enumMeber : element.getEnclosedElements()) {
-                if(enumMeber.getKind().equals(ElementKind.ENUM_CONSTANT))
-                    prototype.getMembers().add(new JSType(utils.fieldName(enumMeber), Type.ENUM_MEMBER));
+                if(enumMeber.getKind().equals(ElementKind.ENUM_CONSTANT)) {
+                    prototype.getMembers().add(new JSType(utils.typeName(enumMeber), utils.fieldName(enumMeber), Type.ENUM_MEMBER));
+                }
             }
 
 
@@ -122,21 +123,22 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     private JSType convertPrimitive(Element element) {
         String fieldName = utils.fieldName(element);
+        String typeName = utils.typeName(element);
         if(utils.isBoolean(element)) {
-            return new JSType(fieldName, Type.BOOLEAN);
+            return new JSType(typeName, fieldName, Type.BOOLEAN);
         }
         else if(utils.isString(element)) {
-            return new JSType(fieldName, Type.STRING);
+            return new JSType(typeName, fieldName, Type.STRING);
         }
         else if(utils.isByte(element)) {
             // TODO: implement
-            return new JSType(fieldName, Type.UNDEFINED);
+            return new JSType(typeName, fieldName, Type.UNDEFINED);
         }
         else if(utils.isNumeric(element)) {
-            return new JSType(fieldName, Type.NUMBER);
+            return new JSType(typeName, fieldName, Type.NUMBER);
         }
         else {
-            return new JSType(fieldName, Type.UNDEFINED);
+            return new JSType(typeName, fieldName, Type.UNDEFINED);
         }
     }
 
@@ -150,7 +152,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     private JSType fetchPrototypeFor(Element element) {
         if(!prototypes.containsKey(element))
-            prototypes.put(element, new JSType(utils.fieldName(element)));
+            prototypes.put(element, new JSType(utils.typeName(element), utils.fieldName(element), Type.UNDEFINED));
         return prototypes.get(element);
     }
 }
