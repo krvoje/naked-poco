@@ -60,29 +60,29 @@ public class TypeMirrorUtils {
         this.messager = messager;
 
         this.BYTE_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.BYTE);
-        this.BYTE_TYPE= typeForClass(java.lang.Byte.class);
+        this.BYTE_TYPE= typeForClass(Byte.class);
         this.BOOLEAN_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.BOOLEAN);
-        this.BOOLEAN_TYPE= typeForClass(java.lang.Boolean.class);
+        this.BOOLEAN_TYPE= typeForClass(Boolean.class);
         this.CHAR_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.CHAR);
-        this.CHAR_TYPE = typeForClass(java.lang.Character.class);
+        this.CHAR_TYPE = typeForClass(Character.class);
         this.SHORT_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.SHORT);
-        this.SHORT_TYPE = typeForClass(java.lang.Short.class);
+        this.SHORT_TYPE = typeForClass(Short.class);
         this.INT_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.INT);
-        this.INT_TYPE = typeForClass(java.lang.Integer.class);
+        this.INT_TYPE = typeForClass(Integer.class);
         this.LONG_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.LONG);
-        this.LONG_TYPE = typeForClass(java.lang.Long.class);
+        this.LONG_TYPE = typeForClass(Long.class);
         this.FLOAT_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.FLOAT);
-        this.FLOAT_TYPE = typeForClass(java.lang.Float.class);
+        this.FLOAT_TYPE = typeForClass(Float.class);
         this.DOUBLE_PRIMITIVE_TYPE = types.getPrimitiveType(TypeKind.DOUBLE);
-        this.DOUBLE_TYPE = typeForClass(java.lang.Double.class);
+        this.DOUBLE_TYPE = typeForClass(Double.class);
 
-        this.STRING_TYPE = typeForClass(java.lang.String.class);
-        this.OBJECT_TYPE = typeForClass(java.lang.Object.class);
-        this.CLASS_TYPE = typeForClass(java.lang.Class.class);
-        this.ENUM_TYPE = typeForClass(java.lang.Enum.class);
-        this.ITERABLE_TYPE = typeForClass(java.lang.Iterable.class);
+        this.STRING_TYPE = typeForClass(String.class);
+        this.OBJECT_TYPE = typeForClass(Object.class);
+        this.CLASS_TYPE = typeForClass(Class.class);
+        this.ENUM_TYPE = typeForClass(Enum.class);
+        this.ITERABLE_TYPE = typeForClass(Iterable.class);
 
-        this.ITERABLE_TYPE_ELEMENT = elements.getTypeElement(java.lang.Iterable.class.getCanonicalName());
+        this.ITERABLE_TYPE_ELEMENT = elements.getTypeElement(Iterable.class.getCanonicalName());
     }
 
     public boolean isNumeric(Element element) {
