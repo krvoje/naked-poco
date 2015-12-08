@@ -1,5 +1,7 @@
 package org.nakedpojo.utils;
 
+import java.util.Map;
+
 public class Commons {
 
     public static final String GET_PREFIX = "get";
@@ -77,5 +79,15 @@ public class Commons {
     public static <T> T last(T[] ts) {
         if(nullOrEmpty(ts)) return null;
         else return ts[ts.length-1];
+    }
+
+    public static String join(Map map, String separator) {
+        StringBuilder sb = new StringBuilder();
+        for(Object e: map.values()) {
+            if(e==null) continue;
+            sb.append(e.toString());
+            sb.append(separator);
+        }
+        return sb.toString();
     }
 }

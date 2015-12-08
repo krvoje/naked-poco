@@ -1,4 +1,4 @@
-package org.nakedpojo.annotations;
+package org.nakedpojo.configuration;
 
 public enum TemplateType {
     DEFAULT("KnockoutObservableTemplates.stg"),

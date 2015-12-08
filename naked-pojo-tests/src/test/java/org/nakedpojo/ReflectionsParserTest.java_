@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.nakedpojo.annotations.TemplateType;
+import org.nakedpojo.configuration.TemplateType;
 import org.nakedpojo.model.Author;
 import org.nakedpojo.model.Book;
 import org.nakedpojo.parser.ReflectionsParser;

@@ -1,6 +1,8 @@
     function PrimitiveFieldsOnly() {
         self = this;
 
+        self.booleanNullable=false;
+        self.booleanPrimitive=false;
         self.doubleNullable=0;
         self.doublePrimitive=0;
         self.floatNullable=0;
@@ -13,6 +15,8 @@
         self.shortPrimitive=0;
 
         self.update = function(dto) {
+            self.booleanNullable=dto.booleanNullable;
+            self.booleanPrimitive=dto.booleanPrimitive;
             self.doubleNullable=dto.doubleNullable;
             self.doublePrimitive=dto.doublePrimitive;
             self.floatNullable=dto.floatNullable;

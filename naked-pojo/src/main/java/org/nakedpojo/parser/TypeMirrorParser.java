@@ -41,7 +41,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     public JSType convert(Element element) {
         assertNotNull(element);
-        return convert(element, utils.fieldName(element));
+        return convert(element, utils.simpleName(element));
     }
 
     public JSType convert(Element element, String fieldName) {
@@ -60,11 +60,9 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         } else if(utils.isEnum(element)) {
             for(Element enumMeber : element.getEnclosedElements()) {
                 if(enumMeber.getKind().equals(ElementKind.ENUM_CONSTANT)) {
-                    prototype.getMembers().add(new JSType(utils.typeName(enumMeber), utils.fieldName(enumMeber), Type.ENUM_MEMBER));
+                    prototype.getMembers().add(new JSType(utils.typeName(enumMeber), utils.simpleName(enumMeber), Type.ENUM_MEMBER));
                 }
             }
-
-
             prototypes.put(element,
                     prototype
                         .withType(Type.ENUM));
@@ -111,7 +109,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         JSType prototype = fetchPrototypeFor(element);
         Set<JSType> members = prototype.getMembers();
         for (Element field : utils.publicFields(element)) {
-            members.add(convert(field, utils.fieldName(field)));
+            members.add(convert(field, utils.simpleName(field)));
         }
     }
 
@@ -122,7 +120,7 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     }
 
     private JSType convertPrimitive(Element element) {
-        String fieldName = utils.fieldName(element);
+        String fieldName = utils.simpleName(element);
         String typeName = utils.typeName(element);
         if(utils.isBoolean(element)) {
             return new JSType(typeName, fieldName, Type.BOOLEAN);
@@ -152,7 +150,10 @@ public class TypeMirrorParser implements Parser<Element, JSType>
 
     private JSType fetchPrototypeFor(Element element) {
         if(!prototypes.containsKey(element))
-            prototypes.put(element, new JSType(utils.typeName(element), utils.fieldName(element), Type.UNDEFINED));
+            prototypes.put(element,
+                    new JSType(utils.typeName(element)
+                            , utils.simpleName(element)
+                            , Type.UNDEFINED));
         return prototypes.get(element);
     }
 }

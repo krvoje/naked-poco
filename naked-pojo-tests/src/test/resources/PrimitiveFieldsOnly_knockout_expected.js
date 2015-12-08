@@ -1,6 +1,8 @@
     function PrimitiveFieldsOnly() {
         self = this;
 
+        self.booleanNullable=ko.observable(false);
+        self.booleanPrimitive=ko.observable(false);
         self.doubleNullable=ko.observable(0);
         self.doublePrimitive=ko.observable(0);
         self.floatNullable=ko.observable(0);
@@ -13,6 +15,8 @@
         self.shortPrimitive=ko.observable(0);
 
         self.update = function(dto) {
+            self.booleanNullable(dto.booleanNullable);
+            self.booleanPrimitive(dto.booleanPrimitive);
             self.doubleNullable(dto.doubleNullable);
             self.doublePrimitive(dto.doublePrimitive);
             self.floatNullable(dto.floatNullable);

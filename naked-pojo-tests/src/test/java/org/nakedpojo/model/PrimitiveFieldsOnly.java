@@ -1,7 +1,6 @@
 package org.nakedpojo.model;
 
 import org.nakedpojo.annotations.Naked;
-import org.nakedpojo.annotations.TemplateType;
 
 @Naked
 public class PrimitiveFieldsOnly {
@@ -10,10 +9,12 @@ public class PrimitiveFieldsOnly {
     public Long longNullable;
     public Double doubleNullable;
     public Float floatNullable;
+    public Boolean booleanNullable;
 
     public short shortPrimitive;
     public int integerPrimitive;
     public long longPrimitive;
     public double doublePrimitive;
     public float floatPrimitive;
+    public boolean booleanPrimitive;
 }

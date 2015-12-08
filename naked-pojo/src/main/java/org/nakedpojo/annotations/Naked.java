@@ -1,5 +1,7 @@
 package org.nakedpojo.annotations;
 
+import org.nakedpojo.configuration.TemplateType;
+
 public @interface Naked {
 
     /**
@@ -8,7 +10,7 @@ public @interface Naked {
     public static final String NAME = "org.nakedpojo.annotations.Naked";
 
     /**
-     * The fieldName of the target type in the generated code
+     * The simpleName of the target type in the generated code
      */
     // TODO: implement this
     String targetTypeName() default "";

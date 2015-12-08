@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.nakedpojo.utils.Commons.equalsEither;
 import static org.nakedpojo.utils.Commons.fieldNameFromGetterOrSetter;
 import static org.nakedpojo.utils.Commons.nullOrEmpty;
 
@@ -108,6 +107,7 @@ public class TypeMirrorUtils {
     public boolean isPrimitive(Element element) {
         return element.asType().getKind().isPrimitive()
                 || isNumeric(element)
+                || isBoolean(element)
                 || types.isSameType(element.asType(), STRING_TYPE);
     }
 
@@ -158,7 +158,7 @@ public class TypeMirrorUtils {
         return element.getKind().isClass();
     }
 
-    public String fieldName(Element element) {
+    public String simpleName(Element element) {
         return element.getSimpleName().toString();
     }
 
@@ -210,7 +210,7 @@ public class TypeMirrorUtils {
     }
 
     public boolean isGetter(Element element) {
-        return Commons.isGetterName(fieldName(element))
+        return Commons.isGetterName(simpleName(element))
                 && element instanceof ExecutableElement
                 && element.getModifiers().contains(Modifier.PUBLIC)
                 && !((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)
@@ -218,7 +218,7 @@ public class TypeMirrorUtils {
     }
 
     public boolean isSetter(Element element) {
-        return Commons.isSetterName(fieldName(element))
+        return Commons.isSetterName(simpleName(element))
                 && element.asType().getKind().equals(TypeKind.EXECUTABLE)
                 && element.getModifiers().contains(Modifier.PUBLIC)
                 && ((ExecutableElement) element).getReturnType().getKind().equals(TypeKind.VOID)
