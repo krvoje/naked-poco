@@ -3,7 +3,6 @@ package org.nakedpojo.processor;
 import org.nakedpojo.NakedPojo;
 import org.nakedpojo.annotations.Naked;
 import org.nakedpojo.configuration.Config;
-import org.nakedpojo.configuration.Config.*;
 import org.nakedpojo.parser.TypeMirrorParser;
 import org.nakedpojo.utils.TypeMirrorUtils;
 
@@ -13,11 +12,17 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.*;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+import static org.nakedpojo.configuration.Config.GenerationStrategy.MULTIPLE_FILES;
+import static org.nakedpojo.configuration.Config.GenerationStrategy.SINGLE_FILE;
+import static org.nakedpojo.configuration.NameClashDetectionStrategy.*;
 import static org.nakedpojo.utils.Commons.join;
 import static org.nakedpojo.utils.Commons.nullOrEmpty;
 
@@ -84,14 +89,20 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
             nakedPojo.setTargetTypeName(element, targetTypeName);
             String content = nakedPojo.render(element, templateFilename);
 
-            rendered.put(targetTypeName,
-                    rendered.containsKey(targetTypeName) ?
-                    rendered.get(targetTypeName) + content
-                    : content
-            );
+            // Check for duplicates
+            if(!naked.nameClashDetectionStrategy().equals(IGNORE)
+                    && rendered.containsKey(targetTypeName)) {
+                if(naked.nameClashDetectionStrategy().equals(AUTOCORRECT)){
+                    // TODO:
+                } else if(naked.nameClashDetectionStrategy().equals(FAIL)){
+                    // TODO:
+                }
+            }
+
+            rendered.put(targetTypeName, content);
         }
 
-        if(config.generationStrategy.equals(GenerationStrategy.MULTIPLE_FILES)) {
+        if(config.generationStrategy.equals(MULTIPLE_FILES)) {
             for(Map.Entry<String, String> e: rendered.entrySet()) {
                 String targetTypeName = e.getKey();
                 String content = e.getValue();
@@ -99,7 +110,8 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
             }
         }
 
-        if(config.generationStrategy.equals(GenerationStrategy.SINGLE_FILE)) {
+        if(config.generationStrategy.equals(SINGLE_FILE)) {
+            // TODO: Test
             String content = join(rendered, "\n");
             writeToFile(config.targetFilename, content);
         }
@@ -107,7 +119,7 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
 
     public void writeToFile(String filename, String content) {
         try {
-            System.out.println("Writing content to file:");
+            System.out.println(String.format("Writing content to file '%s':", filename));
             System.out.println(content);
             FileObject fl = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", filename);
             Writer writer = fl.openWriter();

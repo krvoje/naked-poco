@@ -252,7 +252,6 @@ public class TypeMirrorUtils {
     }
 
     private TypeMirror typeForClass(Class clazz) {
-        // FIXME: Returns null for primitive types
         if(clazz.isPrimitive()){
             return typeForPrimitive(clazz);
         } else {

@@ -5,6 +5,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 
 public class JSType {
+    private final String javaCanonicalName;
     private final String typeName;
     private final String fieldName;
     private final Type type;
@@ -15,35 +16,41 @@ public class JSType {
         }
     });
 
-    public JSType(String typeName, String fieldName, Type type, JSType ... members) {
+    public JSType(String javaCanonicalName, String typeName, String fieldName, Type type, JSType ... members) {
+        this.javaCanonicalName = javaCanonicalName;
         this.typeName = typeName;
         this.fieldName = fieldName;
         this.type = type;
         this.members.addAll(asList(members));
     }
 
-    public JSType(String typeName, String fieldName, Type type, Collection<JSType> members) {
-        this(typeName, fieldName, type, members.toArray(new JSType[members.size()]));
+    public JSType(String javaCanonicalName, String typeName, String fieldName, Type type, Collection<JSType> members) {
+        this(javaCanonicalName, typeName, fieldName, type, members.toArray(new JSType[members.size()]));
+    }
+
+
+    public JSType withJavaCanonicalName(String javaCanonicalName) {
+        return new JSType(javaCanonicalName, typeName, fieldName, type, members);
     }
 
     public JSType withTypeName(String typeName) {
-        return new JSType(typeName, fieldName, type, members);
+        return new JSType(javaCanonicalName, typeName, fieldName, type, members);
     }
 
     public JSType withFieldName(String fieldName) {
-        return new JSType(typeName, fieldName, type, members);
+        return new JSType(javaCanonicalName, typeName, fieldName, type, members);
     }
 
     public JSType withType(Type type) {
-        return new JSType(typeName, fieldName, type, members);
+        return new JSType(javaCanonicalName, typeName, fieldName, type, members);
     }
 
     public JSType withMembers(JSType[] members) {
-        return new JSType(typeName, fieldName, type, asList(members));
+        return new JSType(javaCanonicalName, typeName, fieldName, type, asList(members));
     }
 
     public JSType withMembers(Collection<JSType> members) {
-        return new JSType(typeName, fieldName, type, members);
+        return new JSType(javaCanonicalName, typeName, fieldName, type, members);
     }
 
     public String getTypeName() {

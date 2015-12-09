@@ -63,22 +63,22 @@ public class NakedPojo<SOURCE_TYPE> {
         return template.render();
     }
 
-    public void setTargetTypeName(SOURCE_TYPE tp, String name) {
-        JSType prototype = parser.prototypes().get(tp);
-        parser.prototypes().put(tp, prototype.withTypeName(name));
+    public void setTargetTypeName(SOURCE_TYPE source, String name) {
+        JSType prototype = parser.prototypes().get(source);
+        parser.prototypes().put(source, prototype.withTypeName(name));
     }
 
-    private void target(Iterable<SOURCE_TYPE> sources) {
-        for(SOURCE_TYPE element: sources) target(element);
+    private void target(Iterable<SOURCE_TYPE> targets) {
+        for(SOURCE_TYPE element: targets) target(element);
     }
 
-    private void target(SOURCE_TYPE ... source) {
-        target(asList(source));
+    private void target(SOURCE_TYPE ... targets) {
+        target(asList(targets));
     }
 
-    private void target(SOURCE_TYPE source) {
-        if(!targets.contains(source)) {
-            targets.add(source);
+    private void target(SOURCE_TYPE target) {
+        if(!targets.contains(target)) {
+            targets.add(target);
         }
     }
 }
