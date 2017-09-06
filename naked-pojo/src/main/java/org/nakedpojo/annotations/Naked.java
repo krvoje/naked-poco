@@ -5,7 +5,7 @@ import org.nakedpojo.configuration.TemplateType;
 
 public @interface Naked {
 
-    public static final String NAME = "org.nakedpojo.annotations.Naked";
+    String NAME = "org.nakedpojo.annotations.Naked";
 
     String targetTypeName() default "";
 

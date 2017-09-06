@@ -1,5 +1,7 @@
 package org.nakedpojo.configuration;
 
+import org.nakedpojo.Messages;
+
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -19,7 +21,7 @@ public class Config {
 
         private final String VALUE;
 
-        private GenerationStrategy(String generationStrategyValue) {
+        GenerationStrategy(String generationStrategyValue) {
             this.VALUE = generationStrategyValue;
         }
 
@@ -47,7 +49,7 @@ public class Config {
             props.load(is);
         } catch (Exception e) {
             // TODO: Emit warning
-            System.out.println("Did not load nakedpojo.properties, falling back to defaults.");
+            System.out.println(Messages.didNotLoadProperties());
             this.generationStrategy = GenerationStrategy.DEFAULT;
             this.targetFilename = TARGET_FILENAME_DEFAULT;
             return;

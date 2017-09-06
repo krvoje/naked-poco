@@ -1,5 +1,6 @@
 package org.nakedpojo.processor;
 
+import org.nakedpojo.NakedParseException;
 import org.nakedpojo.NakedPojo;
 import org.nakedpojo.annotations.Naked;
 import org.nakedpojo.configuration.Config;
@@ -54,9 +55,11 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if(roundEnv.processingOver()) return false;
         for(TypeElement annotation: annotations) {
-            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
-            if(annotation.getQualifiedName().toString().equals(
-                    Naked.class.getCanonicalName())) {
+            if(annotation
+                    .getQualifiedName()
+                    .toString()
+                    .equals(Naked.class.getCanonicalName())) {
+                Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
                 processNaked(elements);
             }
         }
@@ -81,6 +84,8 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
         nakedPojo.scan(elements);
 
         Map<String, String> rendered = new HashMap<String, String>();
+        Map<String, Integer> typeNameCount = new HashMap<String, Integer>();
+
         for(Element element: elements) {
             Naked naked = element.getAnnotation(Naked.class);
             String templateFilename = templateFilename(naked);
@@ -90,23 +95,20 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
             String content = nakedPojo.render(element, templateFilename);
 
             // Check for duplicates
-            if(!naked.nameClashDetectionStrategy().equals(IGNORE)
-                    && rendered.containsKey(targetTypeName)) {
-                if(naked.nameClashDetectionStrategy().equals(AUTOCORRECT)){
-                    // TODO:
-                } else if(naked.nameClashDetectionStrategy().equals(FAIL)){
-                    // TODO:
-                }
+            if(naked.nameClashDetectionStrategy().equals(IGNORE)) {
+                rendered.put(targetTypeName, content);
+            } else if(naked.nameClashDetectionStrategy().equals(FAIL)){
+                throw new NakedParseException("The template already contains name: " + targetTypeName);
+            } else { // AUTOCORRECT
+                autocorrectTypeName(rendered, typeNameCount, targetTypeName, content);
             }
-
-            rendered.put(targetTypeName, content);
         }
 
         if(config.generationStrategy.equals(MULTIPLE_FILES)) {
             for(Map.Entry<String, String> e: rendered.entrySet()) {
                 String targetTypeName = e.getKey();
                 String content = e.getValue();
-                writeToFile(targetTypeName + ".js", content);
+                writeToFile(targetTypeName + ".js", content); // TODO: Configurable extension
             }
         }
 
@@ -114,6 +116,17 @@ public class NakedAnnotationProcessor extends AbstractProcessor {
             // TODO: Test
             String content = join(rendered, "\n");
             writeToFile(config.targetFilename, content);
+        }
+    }
+
+    private void autocorrectTypeName(Map<String, String> rendered,
+                                     Map<String, Integer> typeNameCount,
+                                     String targetTypeName,
+                                     String content) {
+        if(rendered.containsKey(targetTypeName)) {
+            typeNameCount.get(targetTypeName);
+        } else {
+            rendered.put(targetTypeName, content);
         }
     }
 

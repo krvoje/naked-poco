@@ -40,19 +40,15 @@ public class TypeMirrorParser implements Parser<Element, JSType>
     }
 
     public JSType convert(Element element) {
-        assertNotNull(element);
         return convert(element, utils.simpleName(element));
     }
 
     public JSType convert(Element element, String fieldName) {
-        assertNotNull(element);
         scan(element);
         return prototypes.get(element).withFieldName(fieldName);
     }
 
     public void scan(Element element) {
-        assertNotNull(element);
-
         JSType prototype = prototypeFor(element);
 
         if(utils.isPrimitive(element)) {
@@ -149,9 +145,6 @@ public class TypeMirrorParser implements Parser<Element, JSType>
         return this.prototypes;
     }
 
-    private static void assertNotNull(Element obj) {
-        if(obj == null) throw new NakedParseException(Messages.elementIsNull());
-    }
 
     private JSType prototypeFor(Element element) {
         if(!prototypes.containsKey(element))
