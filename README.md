@@ -1,6 +1,6 @@
 # Naked POJO
 
-A Java-to-JavaScript DTO generator. Still heavily a work in progress.
+A toy Java-to-JavaScript DTO generator.
 
 Use case example:
 
